@@ -417,7 +417,7 @@
     </div>
     </div>
     </div>
-    <form id='form-logout' method='post' action='controller_ff.php' style='display:none'>
+    <form id='form-logout' method='post' action='index.php' style='display:none'>
         <input type='hidden' name='page' value='MainPage'>
         <input type='hidden' name='command' value='LogOut'>
         <input type='submit'>
@@ -426,7 +426,7 @@
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <span id='modal_status_id' style='display:none;'></span>
-                <form method='post' action='controller_ff.php'>
+                <form method='post' action='index.php'>
                     <div class='modal-title'>
                         <h4 class='modal-title'>Comments</h4>
                     </div>
@@ -460,26 +460,30 @@
                     document.getElementById('display_feed_div').innerHTML += "<h3>No posts to show with that Term. Find more friends in the Followers tab, or wait for someone you follow to post</h3>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        let date_string = data[i]['StatusDate'].toString();
-                        console.log(date_string);
-                        let year_string = date_string.substring(0, 4);
-                        let month_string = date_string.substring(4, 6);
-                        let day_string = date_string.substring(6, 8);
+                        // if(
+                        // let date_string = data[i]['statusdate'].toString();
+                        // console.log(date_string);
+                        // let year_string = date_string.substring(0, 4);
+                        // let month_string = date_string.substring(4, 6);
+                        // let day_string = date_string.substring(6, 8);
 
-                        document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['Username'] + "</p><p>" + data[i]['StatusText'] + "</p><p>Date: " + data[i]['StatusDate'] + "</p><span onclick='likeStatusFA(" + data[i]['StatusID'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['StatusID'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
+                        document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['username'] + "</p><p>" + data[i]['statustext'] + "</p><p>Date: " + data[i]['statusdate'] + "</p><span onclick='likeStatusFA(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
                     }
                     document.getElementById('top_bar_search').value = '';
 
                 }
                 showFeed();
+            } else {
+                console.log("monkey");
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
         query += "&command=TopBarSearch";
         query += "&search_text=" + $("#top_bar_search").val();
+        console.log(query);
         xhttp.send(query);
     });
 
@@ -494,16 +498,16 @@
                     document.getElementById('display_feed_div').innerHTML = "<h3>No posts to show. Find more friends in the Followers tab, or wait for someone you follow to post</h3>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        let date_string = data[i]['StatusDate'].toString();
-                        let year_string = date_string.substring(0, 4);
-                        let month_string = date_string.substring(4, 6);
-                        let day_string = date_string.substring(6, 8);
-                        document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['Username'] + "</p><p>" + data[i]['StatusText'] + "</p><p>Date: " + data[i]['StatusDate'] + "</p><span onclick='likeStatus(" + data[i]['StatusID'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['StatusID'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
+                        // let date_string = data[i]['statusdate'].toString();
+                        // let year_string = date_string.substring(0, 4);
+                        // let month_string = date_string.substring(4, 6);
+                        // let day_string = date_string.substring(6, 8);
+                        document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['username'] + "</p><p>" + data[i]['statustext'] + "</p><p>Date: " + data[i]['statusdate'] + "</p><span onclick='likeStatus(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
                     }
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -518,20 +522,21 @@
                 //alert(this.response);
                 document.getElementById('display_feed_div').innerHTML = "";
                 let data = JSON.parse(this.response);
+                console.log(data);
                 if (data.length == 0) {
                     document.getElementById('display_feed_div').innerHTML = "<h3>No posts to show. Find more friends in the Followers tab, or wait for someone you follow to post</h3>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        let date_string = data[i]['StatusDate'].toString();
-                        let year_string = date_string.substring(0, 4);
-                        let month_string = date_string.substring(4, 6);
-                        let day_string = date_string.substring(6, 8);
-                        document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['Username'] + "</p><p>" + data[i]['StatusText'] + "</p><p>Date: " + data[i]['StatusDate'] + "</p><span onclick='likeStatusFA(" + data[i]['StatusID'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['StatusID'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
+                        // let date_string = data[i]['statusdate'].toString();
+                        // let year_string = date_string.substring(0, 4);
+                        // let month_string = date_string.substring(4, 6);
+                        // let day_string = date_string.substring(6, 8);
+                        document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['username'] + "</p><p>" + data[i]['statustext'] + "</p><p>Date: " + data[i]['statusdate'] + "</p><span onclick='likeStatusFA(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
                     }
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -540,46 +545,48 @@
         xhttp.send(query);
     }
 
-    function likeStatus(statusID, currentLikes) {
-        //alert(statusID);
+    function likeStatus(status_id, currentLikes) {
+        //alert(status_id);
         var xhttp = new XMLHttpRequest(); // AJAX code for the SendMessage command. The command will be sent to test_send_message.php.
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 //alert(this.response);
+                console.log("Norm");
                 get_posts();
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
         query += "&command=LikePost";
-        query += "&status_id=" + statusID;
+        query += "&status_id=" + status_id;
         query += "&current_likes=" + currentLikes;
         xhttp.send(query);
     }
 
-    function likeStatusFA(statusID, currentLikes) {
-        //alert(statusID);
+    function likeStatusFA(status_id, currentLikes) {
+        //alert(status_id);
         var xhttp = new XMLHttpRequest(); // AJAX code for the SendMessage command. The command will be sent to test_send_message.php.
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 //alert(this.response);
+                console.log("FA");
                 get_postsFA();
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
         query += "&command=LikePost";
-        query += "&status_id=" + statusID;
+        query += "&status_id=" + status_id;
         query += "&current_likes=" + currentLikes;
         xhttp.send(query);
     }
 
     function getLiked() {
-        //alert(statusID);
+        //alert(status_id);
         var xhttp = new XMLHttpRequest(); // AJAX code for the SendMessage command. The command will be sent to test_send_message.php.
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
@@ -589,16 +596,16 @@
                     document.getElementById('display_likes_div').innerHTML += "<h5>No Liked Posts</h5>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        let date_string = data[i]['StatusDate'].toString();
-                        let year_string = date_string.substring(0, 4);
-                        let month_string = date_string.substring(4, 6);
-                        let day_string = date_string.substring(6, 8);
-                        document.getElementById('display_likes_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['Username'] + "</p><p>" + data[i]['StatusText'] + "</p><p>Date: " + data[i]['StatusDate'] + "</p><span onclick='likeStatus(" + data[i]['StatusID'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['StatusID'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
+                        // let date_string = data[i]['statusdate'].toString();
+                        // let year_string = date_string.substring(0, 4);
+                        // let month_string = date_string.substring(4, 6);
+                        // let day_string = date_string.substring(6, 8);
+                        document.getElementById('display_likes_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['username'] + "</p><p>" + data[i]['statustext'] + "</p><p>Date: " + data[i]['statusdate'] + "</p><span onclick='likeStatus(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
                     }
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -607,7 +614,7 @@
     }
 
     function getCommented() {
-        //alert(statusID);
+        //alert(status_id);
         var xhttp = new XMLHttpRequest(); // AJAX code for the SendMessage command. The command will be sent to test_send_message.php.
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
@@ -618,12 +625,12 @@
                     document.getElementById('display_comments_div').innerHTML += "<h5>No Comments on  Posts</h5>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('display_comments_div').innerHTML += "<div id = 'comment_template_div' ><span>Username: " + data[i]['0'] + "</span><br><span>Status: " + data[i]['1'] + "</span><br><br><span>Your Comment: </span><span>" + data[i]['CommentText'] + "</span></div>";
+                        document.getElementById('display_comments_div').innerHTML += "<div id = 'comment_template_div' ><span>Username: " + data[i]['0'] + "</span><br><span>Status: " + data[i]['1'] + "</span><br><br><span>Your Comment: </span><span>" + data[i]['comment_text'] + "</span></div>";
                     }
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -631,14 +638,14 @@
         xhttp.send(query);
     }
 
-    function openComments(statusID) {
-        //alert(statusID);
+    function openComments(status_id) {
+        //alert(status_id);
         $('#modal_comment').modal('show');
-        $('#modal_status_id').html(statusID);
-        getComments(statusID);
+        $('#modal_status_id').html(status_id);
+        getComments(status_id);
     }
 
-    function getComments(statusID) {
+    function getComments(status_id) {
         var xhttp = new XMLHttpRequest(); // AJAX code for the SendMessage command. The command will be sent to test_send_message.php.
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
@@ -646,17 +653,17 @@
                 let data = JSON.parse(this.response);
                 document.getElementById('modal_comment_display').innerHTML = "";
                 for (let i = 0; i < data.length; i++) {
-                    document.getElementById('modal_comment_display').innerHTML += "<div id = 'comment_template_div' ><span>" + data[i]['Username'] + ": </span><span>" + data[i]['CommentText'] + "</span></div>";
+                    document.getElementById('modal_comment_display').innerHTML += "<div id = 'comment_template_div' ><span>" + data[i]['username'] + ": </span><span>" + data[i]['comment_text'] + "</span></div>";
                 }
                 document.getElementById('input_comment_text').value = '';
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
         query += "&command=GetComments";
-        query += "&status_id=" + statusID;
+        query += "&status_id=" + status_id;
         xhttp.send(query);
     }
 
@@ -668,7 +675,7 @@
                 getComments(this.response);
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -686,17 +693,17 @@
                 // let data = JSON.parse(this.response);
                 // document.getElementById('display_feed_div').innerHTML = "";
                 // for (let i = 0; i < data.length; i++) {
-                //     let date_string = data[i]['StatusDate'].toString();
+                //     let date_string = data[i]['statusdate'].toString();
                 //     console.log(date_string);
                 //     let year_string = date_string.substring(0, 4);
                 //     let month_string = date_string.substring(4, 6);
                 //     let day_string = date_string.substring(6, 8);
-                //     document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['Username'] + "</p><p>" + data[i]['StatusText'] + "</p><p>Date: " + data[i]['StatusDate'] + "</p><span onclick='likeStatus("+data[i]['StatusID']+", "+data[i]['likeCount']+")'style='color: red; cursor: pointer;'>Like </span><span>"+data[i]['likeCount']+"</span><br><span onclick='openComments("+data[i]['StatusID']+")' style='color: blue; cursor: pointer;'>Comments</span></div>";
+                //     document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['username'] + "</p><p>" + data[i]['StatusText'] + "</p><p>Date: " + data[i]['statusdate'] + "</p><span onclick='likeStatus("+data[i]['status_id']+", "+data[i]['likeCount']+")'style='color: red; cursor: pointer;'>Like </span><span>"+data[i]['likeCount']+"</span><br><span onclick='openComments("+data[i]['status_id']+")' style='color: blue; cursor: pointer;'>Comments</span></div>";
                 // }
                 // document.getElementById('create_post_text').value = '';
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -713,7 +720,7 @@
                 document.getElementById('form-logout').submit();
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -751,12 +758,12 @@
                     document.getElementById('pane-messages-unread').innerHTML = "<p>No Messages</p>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['Sender'] + "</p><p>Message: " + data[i]['Message'] + "</p><p>Date: " + data[i]['Date'] + "</p></div>";
+                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>Date: " + data[i]['send_date'] + "</p></div>";
                     }
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -813,7 +820,7 @@
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -837,7 +844,7 @@
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -861,7 +868,7 @@
                 alert(this.response);
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -882,12 +889,12 @@
                     document.getElementById('pane-messages-unread').innerHTML = "<p>No Messages</p>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['Sender'] + "</p><p>Message: " + data[i]['Message'] + "</p><p>Date: " + data[i]['Date'] + "</p></div>";
+                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>Date: " + data[i]['send_date'] + "</p></div>";
                     }
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -906,12 +913,12 @@
                     document.getElementById('pane-messages-read').innerHTML = "<p>No Messages</p>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('pane-messages-read').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['Sender'] + "</p><p>Message: " + data[i]['Message'] + "</p><p>Date: " + data[i]['Date'] + "</p></div>";
+                        document.getElementById('pane-messages-read').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>Date: " + data[i]['send_date'] + "</p></div>";
                     }
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -937,7 +944,7 @@
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -963,7 +970,7 @@
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -985,7 +992,7 @@
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -1054,7 +1061,7 @@
             }
         };
 
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -1072,7 +1079,7 @@
         var xhttp = new XMLHttpRequest(); // AJAX code for the SendMessage command. The command will be sent to test_send_message.php.
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                //alert(this.response);
+                console.log("response");
                 if (this.response == false) {
                     alert("Username Already Exists");
                 } else {
@@ -1082,7 +1089,7 @@
 
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -1103,7 +1110,7 @@
                 get_user_profile((JSON.parse(this.response)[0]['username']));
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -1124,7 +1131,7 @@
                 get_user_profile((JSON.parse(this.response)[0]['username']));
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -1145,7 +1152,7 @@
                 get_user_profile((JSON.parse(this.response)[0]['username']));
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -1175,7 +1182,7 @@
                 }
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
@@ -1201,7 +1208,7 @@
                 get_user_profile((JSON.parse(this.response)[0]['username']));
             }
         };
-        xhttp.open("POST", "controller_ff.php");
+        xhttp.open("POST", "index.php");
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";

@@ -2,7 +2,7 @@
 /*
 *   User management
 */
-$conn = mysqli_connect('localhost', 'kbergman', 'kbergman136', 'C354_kbergman');
+$conn = mysqli_connect('localhost', 'user', '5DCyqwJEqejFJPr', 'FriendForestDB');
 
 function user_is_valid($username, $password)
 {
@@ -48,7 +48,7 @@ function user_exists_U($username)
 }
 function signup_new_user($username, $fname, $lname, $email, $pass)
 {
-    if($username == '' OR $fname == '' OR $lname == '' OR $email == '' OR $pass == ''){
+    if ($username == '' or $fname == '' or $lname == '' or $email == '' or $pass == '') {
         return false;
     }
     $result = false;
@@ -102,13 +102,13 @@ function follow_user($username, $following, $user_term)
 function find_users($username, $user_term)
 {
     global $conn;
-    $sql = "Select username, firstname, lastname from FF_Users WHERE (username NOT IN (SELECT following FROM FF_Following WHERE username = '$username' OR following = '$username')) AND ((username LIKE '%$user_term%') OR (firstname LIKE '%$user_term%') OR (lastname LIKE '%$user_term%')) ORDER BY username DESC";    
+    $sql = "Select username, firstname, lastname from FF_Users WHERE (username NOT IN (SELECT following FROM FF_Following WHERE username = '$username' OR following = '$username')) AND ((username LIKE '%$user_term%') OR (firstname LIKE '%$user_term%') OR (lastname LIKE '%$user_term%')) ORDER BY username DESC";
     $result = mysqli_query($conn, $sql);
     $data = [];
     $i = 0;
     if (mysqli_num_rows($result)) {
         while ($row = mysqli_fetch_assoc($result)) {
-            if($row['username'] != $username){
+            if ($row['username'] != $username) {
                 array_push($row, $user_term);
                 $data[$i++] = $row;
             }
@@ -152,13 +152,13 @@ function like_post($username, $status_id, $current_likes)
     //     return "Invalid Recipient";
     // }
     global $conn;
-    $sql = "Select * FROM FF_StatusLikes WHERE username = '$username' AND StatusID = $status_id";
+    $sql = "Select * FROM FF_StatusLikes WHERE username = '$username' AND status_id = $status_id";
     $result = mysqli_query($conn, $sql);
     if (mysqli_num_rows($result) == 0) {
-        $sql = "INSERT INTO FF_StatusLikes (StatusID, Username) VALUES ($status_id, '$username');";
+        $sql = "INSERT INTO FF_StatusLikes (status_id, Username) VALUES ($status_id, '$username');";
         $result = mysqli_query($conn, $sql);
         $current_likes++;
-        $sql = "UPDATE FF_Status SET likeCount = $current_likes WHERE StatusID = $status_id";
+        $sql = "UPDATE FF_Status SET likeCount = $current_likes WHERE status_id = $status_id";
         $result = mysqli_query($conn, $sql);
     }
     return $current_likes;
@@ -167,7 +167,7 @@ function like_post($username, $status_id, $current_likes)
 function get_comments($status_id)
 {
     global $conn;
-    $sql = "Select * from FF_Comments WHERE StatusID = '$status_id'";
+    $sql = "Select * from FF_Comments WHERE status_id = '$status_id'";
     $result = mysqli_query($conn, $sql);
     $data = [];
     $i = 0;
@@ -188,8 +188,8 @@ function get_commented($username)
     $i = 0;
     if (mysqli_num_rows($result)) {
         while ($row = mysqli_fetch_assoc($result)) {
-            $status_id = $row['StatusID'];
-            $sql = "Select username as status_user, statustext from FF_Status WHERE StatusID = $status_id";
+            $status_id = $row['status_id'];
+            $sql = "Select username as status_user, statustext from FF_Status WHERE status_id = $status_id";
             $result2 = mysqli_query($conn, $sql);
             $row2 = mysqli_fetch_assoc($result2);
             array_push($row, $row2['status_user']);
@@ -202,7 +202,7 @@ function get_commented($username)
 function get_liked($username)
 {
     global $conn;
-    $sql = "Select * from FF_Status WHERE statusID IN (SELECT statusID FROM FF_StatusLikes WHERE  username = '$username') ORDER BY StatusDate DESC";
+    $sql = "Select * from FF_Status WHERE status_id IN (SELECT status_id FROM FF_StatusLikes WHERE  username = '$username') ORDER BY StatusDate DESC";
     $result = mysqli_query($conn, $sql);
     $data = [];
     $i = 0;
@@ -217,7 +217,7 @@ function get_liked($username)
 function make_comment($status_id, $username, $comment_text)
 {
     global $conn;
-    $sql = "INSERT INTO FF_Comments (StatusID, Username, CommentText) VALUES ($status_id, '$username', '$comment_text');";
+    $sql = "INSERT INTO FF_Comments (status_id, username, comment_text) VALUES ($status_id, '$username', '$comment_text');";
     $result = mysqli_query($conn, $sql);
     return $result;
 }
@@ -295,10 +295,12 @@ function get_following($user)
 }
 function edit_username($username, $newusername)
 {
-    if(user_exists_U($newusername)){
+    if (user_exists_U($newusername)) {
         return false;
     }
     global $conn;
+    $sql = "SET FOREIGN_KEY_CHECKS=0;";
+    $result = mysqli_query($conn, $sql);
     $sql = "UPDATE FF_Users SET username = '$newusername' WHERE username = '$username'";
     $result = mysqli_query($conn, $sql);
     $sql = "Select username from FF_Users where username = '$newusername'";
@@ -307,12 +309,18 @@ function edit_username($username, $newusername)
     if (mysqli_num_rows($result)) {
         $data[0] = mysqli_fetch_assoc($result);
         update_tables($username, $newusername);
+        $sql = "SET FOREIGN_KEY_CHECKS=1;";
+        $result = mysqli_query($conn, $sql);
         return $data;
-    } else
+    } else {
+        $sql = "SET FOREIGN_KEY_CHECKS=1;";
+        $result = mysqli_query($conn, $sql);
         return false;
+    }
 }
 
-function update_tables($username, $newusername){
+function update_tables($username, $newusername)
+{
     global $conn;
     $sql = "UPDATE FF_Comments SET username = '$newusername' WHERE username = '$username'";
     mysqli_query($conn, $sql);
@@ -381,7 +389,7 @@ function edit_bio($username, $bio)
 }
 function edit_email($username, $email)
 {
-    if(check_email($email)){
+    if (check_email($email)) {
         return false;
     }
     global $conn;
@@ -455,8 +463,8 @@ function read_message($receiver, $readstate)
         while ($row = mysqli_fetch_assoc($result)) {
             $data[$i++] = $row;
             if ($readstate == 0) {
-                $id = $row['ID'];
-                $sql = "UPDATE FF_Messages SET ReadOrNot = 1 WHERE ID = '$id'";
+                $id = $row['message_id'];
+                $sql = "UPDATE FF_Messages SET ReadOrNot = 1 WHERE message_id = '$id'";
                 mysqli_query($conn, $sql);
             }
         }

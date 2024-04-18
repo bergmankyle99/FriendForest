@@ -12,7 +12,7 @@ if (empty($_POST['page'])) {  // When no page is sent from the client; The initi
     include('view_startpage_ff.php');
     exit();
 }
-$sess_user = '';
+$sess_user = 'sess_user';
 $search_data = [];
 $message_data = [];
 $getuser_data = [];

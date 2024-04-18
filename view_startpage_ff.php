@@ -103,7 +103,7 @@
     <div class='modal fade' id='modal-login'>
         <div class='modal-dialog'>
             <div class='modal-content'>
-                <form method='post' action='controller_ff.php'>
+                <form method='post' action='index.php'>
                     <div class='modal-title'>
                         <h2 class='modal-title'>Login</h2>
                     </div>
@@ -138,7 +138,7 @@
     <div class='modal fade' id='modal-signup'>
         <div class='modal-dialog'>
             <div class='modal-content'>
-                <form method='post' action='controller_ff.php' id='start_signup'>
+                <form method='post' action='index.php' id='start_signup'>
                     <div class='modal-title'>
                         <h2 class='modal-title'>Sign Up</h2>
                     </div>
