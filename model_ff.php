@@ -7,7 +7,8 @@ $conn = mysqli_connect('localhost', 'user', '5DCyqwJEqejFJPr', 'FriendForestDB')
 function user_is_valid($username, $password)
 {
     global $conn;
-    $sql = "Select * from FF_Users where username = '$username' AND password = '$password'";
+    $pass_hash = sha1($password);
+    $sql = "Select * from FF_Users where username = '$username' AND password = '$pass_hash'";
     $result = mysqli_query($conn, $sql);
     if (mysqli_num_rows($result))
         return true;
@@ -55,7 +56,8 @@ function signup_new_user($username, $fname, $lname, $email, $pass)
     if (!user_exists_UE($username, $email)) {
         global $conn;
         $current_date = date("Ymd");
-        $sql = "INSERT INTO FF_Users (username, firstname, lastname, email, password, bio, datejoined) VALUES ('$username', '$fname', '$lname', '$email','$pass', '','$current_date')";
+        $pass_hash = sha1($pass);
+        $sql = "INSERT INTO FF_Users (username, firstname, lastname, email, password, bio, datejoined) VALUES ('$username', '$fname', '$lname', '$email','$pass_hash', '','$current_date')";
         $result = mysqli_query($conn, $sql);
     }
     return $result;

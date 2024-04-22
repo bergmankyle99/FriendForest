@@ -117,11 +117,11 @@
                                     <input class="form-control" id='input-login-username' type='text' name='username' required>
                                     <?php if (!empty($error_msg_username)) echo $error_msg_username; ?>
                                 </div>
-                                <row>
+                                <div class="row">
                                     <label class='control_label' for='input-login-password'>Password:</label>
                                     <input class="form-control" id='input-login-password' type='password' name='password'>
                                     <?php if (!empty($error_msg_password)) echo $error_msg_password; ?>
-                                </row>
+                                </div>
                             </div>
                         </div>
                     </div>
