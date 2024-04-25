@@ -16,6 +16,10 @@
                     event.preventDefault();
                 }
             });
+        $(document).ready(function() {
+            showFeed();
+            get_posts();
+        });
     </script>
     <?php
     $user_var = '';
@@ -41,7 +45,7 @@
 
             height: 50px;
             width: 100vw;
-            background-color: rgb(12, 79, 237);
+            background-color: #5da27e;
             font-size: 2em;
             color: white;
             z-index: 3;
@@ -93,7 +97,22 @@
             border: none;
             border: solid 1px #ccc;
             border-radius: 10px;
-            background-color: rgb(12, 79, 237);
+            background-color: #5da27e;
+        }
+
+        #liked_title_div {
+            display: none;
+            position: fixed;
+            text-align: center;
+            font-size: 1.5em;
+            color: white;
+            margin-top: 3px;
+            width: 60%;
+            margin-left: 3px;
+            border: none;
+            border: solid 1px #ccc;
+            border-radius: 10px;
+            background-color: #5da27e;
         }
 
         #find_user_search_div {
@@ -108,7 +127,7 @@
             border: none;
             border: solid 1px #ccc;
             border-radius: 10px;
-            background-color: rgb(12, 79, 237);
+            background-color: #5da27e;
         }
 
         #select_follower_page_div {
@@ -122,7 +141,7 @@
             border: none;
             border: solid 1px #ccc;
             border-radius: 10px;
-            background-color: rgb(12, 79, 237);
+            background-color: #5da27e;
         }
 
         #create_message_div {
@@ -137,7 +156,7 @@
             border: none;
             border: solid 1px #ccc;
             border-radius: 10px;
-            background-color: rgb(12, 79, 237);
+            background-color: #5da27e;
         }
 
         #refresh_messages {
@@ -201,15 +220,14 @@
         #content_div {
             display: inline-block;
             position: relative;
-            top: 5%;
+            top: 6%;
             width: 82%;
-            height: 95%;
+            height: 94%;
             border-right: 2px solid black;
             border-top: 2px solid black;
         }
 
         #hor_line {
-            border-bottom: 2px solid black;
             position: relative;
             width: 100%;
             height: auto;
@@ -219,6 +237,16 @@
             font-size: x-large;
             padding-left: 10px;
             cursor: pointer;
+            background-image: linear-gradient(90deg,
+                    rgba(79, 124, 94, 0.42) 0%,
+                    rgba(255, 255, 255, 0) 100%);
+            background-size: 0 100%;
+            background-repeat: no-repeat;
+            transition: 0.4s;
+        }
+
+        .menu_item:hover {
+            background-size: 100% 100%;
         }
 
         #menu_item_logout {
@@ -229,6 +257,7 @@
 
         #post_template_div {
             border-bottom: 2px solid black;
+            padding: 10px;
         }
 
         #follower_template_div {
@@ -287,6 +316,21 @@
             left: calc(50vw - 200px);
             z-index: 999;
         }
+
+        .heart {
+            color: gray;
+            /* Default color */
+            transition: color 0.3s;
+            /* Smooth color transition */
+            cursor: pointer;
+            /* Change cursor to pointer on hover */
+        }
+
+        /* Define CSS for red heart */
+        .heart.red {
+            color: red;
+            /* Red color */
+        }
     </style>
 </head>
 
@@ -305,7 +349,7 @@
                 <img src='user_icon.png' style="position: relative; width: 20%; height: auto;">
                 <p id='menu_username_label' style="position: relative; display: inline-block; font-size: 1.5em;">Username</p>
                 <p id='hor_line'></p>
-                <p id='menu_item_feed' class='menu_item'>Feed</p>
+                <p id='menu_item_feed' class='menu_item'>Home</p>
                 <p id='menu_item_following' class='menu_item'>Following</p>
                 <p id='menu_item_messages' class='menu_item'>Messages</p>
                 <p id='menu_item_liked' class='menu_item'>Liked Posts</p>
@@ -322,6 +366,9 @@
                     <button id='create_post_button' type="button" class="btn btn-secondary">Post</button>
                 </form>
             </div>
+            <div id="liked_title_div">
+                <h3>Your Liked Posts</h3>
+            </div>
             <div id='create_message_div'>
                 <label for="create_message_text">Create Message</label>
                 <input type="text" id="create_message_receiver" name='receiver' placeholder="Receiver">
@@ -336,7 +383,7 @@
                     Following
                 </div>
                 <div id='find_users_div' style='display: inline-block; text-align: center;  width: 32%; border-left: 2px solid black; cursor: pointer;'>
-                    Find Users
+                    Find Friends
                 </div>
             </div>
             <div id='content_div' style='overflow-y: auto;'>
@@ -467,7 +514,7 @@
                         // let month_string = date_string.substring(4, 6);
                         // let day_string = date_string.substring(6, 8);
 
-                        document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['username'] + "</p><p>" + data[i]['statustext'] + "</p><p>Date: " + data[i]['statusdate'] + "</p><span onclick='likeStatusFA(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
+                        document.getElementById('display_feed_div').innerHTML += "<div id='post_template_div'><h3>" + data[i]['username'] + "</h3><p>" + data[i]['statustext'] + "</p><p>" + data[i]['statusdate'] + "</p><div style='display: inline-block;'><span class='heart' onclick='likeStatusFA(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ", this)' style='color: red; cursor: pointer;'>&#10084;</span><span>" + data[i]['likeCount'] + "</span></div><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer; margin-left: 10px;'>&#128172;</span></div>";
                     }
                     document.getElementById('top_bar_search').value = '';
 
@@ -502,7 +549,7 @@
                         // let year_string = date_string.substring(0, 4);
                         // let month_string = date_string.substring(4, 6);
                         // let day_string = date_string.substring(6, 8);
-                        document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['username'] + "</p><p>" + data[i]['statustext'] + "</p><p>Date: " + data[i]['statusdate'] + "</p><span onclick='likeStatus(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
+                        document.getElementById('display_feed_div').innerHTML += "<div id='post_template_div'><h3>" + data[i]['username'] + "</h3><p>" + data[i]['statustext'] + "</p><p>" + data[i]['statusdate'] + "</p><div style='display: inline-block;'><span class='heart' onclick='likeStatusFA(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ", this)' style='color: red; cursor: pointer;'>&#10084;</span><span>" + data[i]['likeCount'] + "</span></div><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer; margin-left: 10px;'>&#128172;</span></div>"
                     }
                 }
             }
@@ -531,7 +578,7 @@
                         // let year_string = date_string.substring(0, 4);
                         // let month_string = date_string.substring(4, 6);
                         // let day_string = date_string.substring(6, 8);
-                        document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['username'] + "</p><p>" + data[i]['statustext'] + "</p><p>Date: " + data[i]['statusdate'] + "</p><span onclick='likeStatusFA(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
+                        document.getElementById('display_feed_div').innerHTML += "<div id='post_template_div'><h3>" + data[i]['username'] + "</h3><p>" + data[i]['statustext'] + "</p><p>" + data[i]['statusdate'] + "</p><div style='display: inline-block;'><span class='heart' onclick='likeStatusFA(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ", this)' style='color: red; cursor: pointer;'>&#10084;</span><span>" + data[i]['likeCount'] + "</span></div><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer; margin-left: 10px;'>&#128172;</span></div>";
                     }
                 }
             }
@@ -540,12 +587,11 @@
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         var query = "";
         query += "page=MainPage";
-        query += "&command=TopBarSearch";
-        query += "&search_text=" + $("#top_bar_search").val();
+        query += "&command=GetPosts";
         xhttp.send(query);
     }
 
-    function likeStatus(status_id, currentLikes) {
+    function likeStatus(status_id, currentLikes, element) {
         //alert(status_id);
         var xhttp = new XMLHttpRequest(); // AJAX code for the SendMessage command. The command will be sent to test_send_message.php.
         xhttp.onreadystatechange = function() {
@@ -553,6 +599,7 @@
                 //alert(this.response);
                 console.log("Norm");
                 get_posts();
+                $(element).toggleClass('red');
             }
         };
         xhttp.open("POST", "index.php");
@@ -565,7 +612,7 @@
         xhttp.send(query);
     }
 
-    function likeStatusFA(status_id, currentLikes) {
+    function likeStatusFA(status_id, currentLikes, element) {
         //alert(status_id);
         var xhttp = new XMLHttpRequest(); // AJAX code for the SendMessage command. The command will be sent to test_send_message.php.
         xhttp.onreadystatechange = function() {
@@ -573,6 +620,7 @@
                 //alert(this.response);
                 console.log("FA");
                 get_postsFA();
+                $(element).toggleClass('red');
             }
         };
         xhttp.open("POST", "index.php");
@@ -591,7 +639,7 @@
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 let data = JSON.parse(this.response);
-                document.getElementById('display_likes_div').innerHTML = "<h3 style='border-bottom: 2px solid black'>Your Liked Posts</h3>";
+                //document.getElementById('display_likes_div').innerHTML = "<h3 style='border-bottom: 2px solid black'>Your Liked Posts</h3>";
                 if (data.length == 0) {
                     document.getElementById('display_likes_div').innerHTML += "<h5>No Liked Posts</h5>";
                 } else {
@@ -600,7 +648,7 @@
                         // let year_string = date_string.substring(0, 4);
                         // let month_string = date_string.substring(4, 6);
                         // let day_string = date_string.substring(6, 8);
-                        document.getElementById('display_likes_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['username'] + "</p><p>" + data[i]['statustext'] + "</p><p>Date: " + data[i]['statusdate'] + "</p><span onclick='likeStatus(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ")'style='color: red; cursor: pointer;'>Like </span><span>" + data[i]['likeCount'] + "</span><br><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer;'>Comments</span></div>";
+                        document.getElementById('display_likes_div').innerHTML += "<div id='post_template_div'><h3>" + data[i]['username'] + "</h3><p>" + data[i]['statustext'] + "</p><p>" + data[i]['statusdate'] + "</p><div style='display: inline-block;'><span class='heart' onclick='likeStatusFA(" + data[i]['status_id'] + ", " + data[i]['likeCount'] + ", this)' style='color: red; cursor: pointer;'>&#10084;</span><span>" + data[i]['likeCount'] + "</span></div><span onclick='openComments(" + data[i]['status_id'] + ")' style='color: blue; cursor: pointer; margin-left: 10px;'>&#128172;</span></div>";
                     }
                 }
             }
@@ -698,7 +746,7 @@
                 //     let year_string = date_string.substring(0, 4);
                 //     let month_string = date_string.substring(4, 6);
                 //     let day_string = date_string.substring(6, 8);
-                //     document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><p>Username: " + data[i]['username'] + "</p><p>" + data[i]['StatusText'] + "</p><p>Date: " + data[i]['statusdate'] + "</p><span onclick='likeStatus("+data[i]['status_id']+", "+data[i]['likeCount']+")'style='color: red; cursor: pointer;'>Like </span><span>"+data[i]['likeCount']+"</span><br><span onclick='openComments("+data[i]['status_id']+")' style='color: blue; cursor: pointer;'>Comments</span></div>";
+                //     document.getElementById('display_feed_div').innerHTML += "<div id = 'post_template_div' ><h2>"+data[i]['username'] + "</h2><p>" + data[i]['StatusText'] + "</p><p>" + data[i]['statusdate'] + "</p><span onclick='likeStatus("+data[i]['status_id']+", "+data[i]['likeCount']+")'style='color: red; cursor: pointer;'>Like </span><span>"+data[i]['likeCount']+"</span><br><span onclick='openComments("+data[i]['status_id']+")' style='color: blue; cursor: pointer;'>&#128172;</span></div>";
                 // }
                 // document.getElementById('create_post_text').value = '';
             }
@@ -758,7 +806,7 @@
                     document.getElementById('pane-messages-unread').innerHTML = "<p>No Messages</p>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>Date: " + data[i]['send_date'] + "</p></div>";
+                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>" + data[i]['send_date'] + "</p></div>";
                     }
                 }
             }
@@ -779,11 +827,15 @@
     })
 
     function showLiked() {
+        document.getElementById('liked_title_div').style.display = 'inline-block';
         $('#display_likes_div').show();
     }
 
     function hideLiked() {
+        $('#liked_title_div').hide();
         $('#display_likes_div').hide();
+        document.getElementById('display_likes_div').innerHTML = '';
+
     }
     $('#menu_item_comments').click(function() {
         //alert(this.innerHTML);
@@ -815,7 +867,7 @@
                     document.getElementById('display_followers_div').innerHTML += "<h3>You currently have 0 followers. Connect with friends on the 'Find Friends' tab</h3>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('display_followers_div').innerHTML += "<div id = 'follower_template_div' ><p>Username: " + data[i]['username'] + "</p></div>";
+                        document.getElementById('display_followers_div').innerHTML += "<div id = 'follower_template_div' ><h3>" + data[i]['username'] + "</h3></div>";
                     }
                 }
             }
@@ -839,7 +891,7 @@
                     document.getElementById('display_followers_div').innerHTML = "<h3>You are not currently following any users. Connect with friends in the 'Find Friends' tab</h3>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('display_followers_div').innerHTML += "<div id = 'follower_template_div' ><p>Username: " + data[i]['following'] + "</p><button onclick = \"unfollow_user('" + data[i]['following'] + "')\">Unfollow</button></div>";
+                        document.getElementById('display_followers_div').innerHTML += "<div id = 'follower_template_div' style='display: block;' ><h3 style='display: inline'>" + data[i]['following'] + "</h3><button style='float: right;' onclick = \"unfollow_user('" + data[i]['following'] + "')\">Unfollow</button></div>";
                     }
                 }
             }
@@ -854,7 +906,7 @@
 
     $('#find_users_div').click(function() {
         document.getElementById('display_followers_div').innerHTML = "";
-        document.getElementById('display_followers_div').innerHTML += "<div id='find_user_search_div' style=\"display: inline-block;\"><label class='control_label' for='find_user_text'>Find User: </label><input type='text' id='find_user_text' name='username' value='' placeholder='Name or Username'><button onclick = 'find_user_button_click()' id='find_user_button' type='button' class='btn btn-secondary'>Post</button></div>";
+        document.getElementById('display_followers_div').innerHTML += "<div id='find_user_search_div' style=\"display: inline-block;\"><label class='control_label' for='find_user_text'>Find User: </label><input type='text' id='find_user_text' name='username' value='' placeholder='Name or Username'><button onclick = 'find_user_button_click()' id='find_user_button' type='button' class='btn btn-secondary'>Find</button></div>";
     });
 
     $('#create_message_button').click(function() {
@@ -889,7 +941,7 @@
                     document.getElementById('pane-messages-unread').innerHTML = "<p>No Messages</p>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>Date: " + data[i]['send_date'] + "</p></div>";
+                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>" + data[i]['send_date'] + "</p></div>";
                     }
                 }
             }
@@ -913,7 +965,7 @@
                     document.getElementById('pane-messages-read').innerHTML = "<p>No Messages</p>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('pane-messages-read').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>Date: " + data[i]['send_date'] + "</p></div>";
+                        document.getElementById('pane-messages-read').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>" + data[i]['send_date'] + "</p></div>";
                     }
                 }
             }
@@ -939,7 +991,7 @@
                     document.getElementById('display_followers_div').innerHTML = "<h3>No Users found with that information</h3>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('display_followers_div').innerHTML += "<div id = 'follower_template_div' ><p>Username: " + data[i]['username'] + "</p><p>First Name: " + data[i]['firstname'] + "</p><p>Last Name: " + data[i]['lastname'] + "</p><button onclick = \"follow_user('" + data[i]['username'] + "', '" + data[i]['0'] + "')\">Follow</button></div>";
+                        document.getElementById('display_followers_div').innerHTML += "<div id = 'follower_template_div' ><h3>" + data[i]['username'] + "</h3><p>First Name: " + data[i]['firstname'] + "</p><p>Last Name: " + data[i]['lastname'] + "</p><button onclick = \"follow_user('" + data[i]['username'] + "', '" + data[i]['0'] + "')\">Follow</button></div>";
                     }
                 }
             }
@@ -965,7 +1017,7 @@
                     document.getElementById('display_followers_div').innerHTML = "<h3>You are not currently following any users. Check the Find Friends tab</h3>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('display_followers_div').innerHTML += "<div id = 'follower_template_div' ><p>Username: " + data[i]['following'] + "</p><button onclick = \"unfollow_user('" + data[i]['following'] + "')\">Unfollow</button></div>";
+                        document.getElementById('display_followers_div').innerHTML += "<div id = 'follower_template_div' style='display: block;' ><h3 style='display: inline'>" + data[i]['following'] + "</h3><button style='float: right;' onclick = \"unfollow_user('" + data[i]['following'] + "')\">Unfollow</button></div>";
                     }
                 }
             }
@@ -988,7 +1040,7 @@
                 let data = JSON.parse(this.response);
                 document.getElementById('display_followers_div').innerHTML = "";
                 for (let i = 0; i < data.length; i++) {
-                    document.getElementById('display_followers_div').innerHTML += "<div id = 'follower_template_div' ><p>Username: " + data[i]['username'] + "</p><p>First Name: " + data[i]['firstname'] + "</p><p>Last Name: " + data[i]['lastname'] + "</p><button onclick = \"follow_user('" + data[i]['username'] + "', '" + data[i]['0'] + "')\">Follow</button></div>";
+                    document.getElementById('display_followers_div').innerHTML += "<div id = 'follower_template_div' ><h3>" + data[i]['username'] + "</h3><p>First Name: " + data[i]['firstname'] + "</p><p>Last Name: " + data[i]['lastname'] + "</p><button onclick = \"follow_user('" + data[i]['username'] + "', '" + data[i]['0'] + "')\">Follow</button></div>";
                 }
             }
         };

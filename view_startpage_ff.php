@@ -23,6 +23,10 @@
             font-family: Arial, sans-serif;
         }
 
+        .form-control {
+            width: 100%;
+        }
+
         .FriendForestStartImg {
             background-image: url("FriendForestStart.jpg");
             height: 100%;
@@ -77,7 +81,7 @@
             margin: auto;
             top: calc(25vh - 125px);
             font-size: 10em;
-            color: rgb(12, 79, 237);
+            color: #5da27e;
         }
 
         #EditedUsername {
@@ -95,10 +99,10 @@
 <body style='margin:0'>
     <div class="FriendForestStartImg">
         <h1 id='FriendForestStartTitle'>FriendForest</h1>
-        <button type="button" class="btn btn-primary" id='menu-login'>Login</button>
+        <button type="button" class="btn btn-success" id='menu-login'>Login</button>
         <br>
         <br>
-        <button type="button" class="btn btn-primary" id='menu-signup'>Sign Up</button>
+        <button type="button" class="btn btn-success" id='menu-signup'>Sign Up</button>
     </div>
     <div class='modal fade' id='modal-login'>
         <div class='modal-dialog'>
@@ -127,8 +131,8 @@
                     </div>
                     <div class='modal-footer'>
                         <div class="input-group">
+                            <button id='send-login-button' type="submit" class="btn btn-outline-success">Log In</button>
                             <button id="cancel-modal-login" type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" required>Cancel</button>
-                            <button id='send-login-button' type="submit" class="btn btn-outline-primary">Log In</button>
                         </div>
                     </div>
                 </form>
@@ -174,8 +178,8 @@
                     </div>
                     <div class='modal-footer'>
                         <div class="input-group">
+                            <button id='send-signup-button' type="submit" class="btn btn-outline-success">Sign Up</button>
                             <button id="cancel-modal-signup" type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
-                            <button id='send-signup-button' type="submit" class="btn btn-outline-primary">Sign Up</button>
                         </div>
                     </div>
                 </form>
