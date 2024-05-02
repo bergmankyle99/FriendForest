@@ -4,11 +4,13 @@
 <!DOCTYPE html>
 
 <html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
     <script>
         $(document).keypress(
             function(event) {
@@ -42,8 +44,7 @@
 
         #top_bar {
             position: absolute;
-
-            height: 50px;
+            height: 5.5%;
             width: 100vw;
             background-color: #5da27e;
             font-size: 2em;
@@ -53,7 +54,7 @@
 
         #top_bar>span {
             display: inline-block;
-            padding-left: 10px;
+            padding-left: 1%;
             width: 25%;
         }
 
@@ -62,7 +63,7 @@
             display: inline-block;
             line-height: 100%;
             font-size: 0.75em;
-            top: 5px;
+            top: 0.5%;
             right: 0;
         }
 
@@ -74,10 +75,14 @@
             border-radius: 10px;
         }
 
+        .dropdown {
+            display: none;
+        }
+
         #create_post_text {
             text-align: left;
             margin-top: 3px;
-            margin-left: 3px;
+
             border: none;
             border: solid 1px #ccc;
             border-radius: 10px;
@@ -93,7 +98,7 @@
             color: white;
             margin-top: 3px;
             width: 60%;
-            margin-left: 3px;
+
             border: none;
             border: solid 1px #ccc;
             border-radius: 10px;
@@ -108,7 +113,21 @@
             color: white;
             margin-top: 3px;
             width: 60%;
-            margin-left: 3px;
+            border: none;
+            border: solid 1px #ccc;
+            border-radius: 10px;
+            background-color: #5da27e;
+        }
+
+        #commented_title_div {
+            display: none;
+            position: fixed;
+            text-align: center;
+            font-size: 1.5em;
+            color: white;
+            margin-top: 3px;
+            width: 60%;
+
             border: none;
             border: solid 1px #ccc;
             border-radius: 10px;
@@ -152,7 +171,7 @@
             color: white;
             margin-top: 3px;
             width: 60%;
-            margin-left: 3px;
+
             border: none;
             border: solid 1px #ccc;
             border-radius: 10px;
@@ -166,9 +185,8 @@
 
         #main_div {
             display: block;
-            position: relative;
             background-color: white;
-            height: 100%;
+            height: 99%;
             margin: auto;
             width: 75vw;
             z-index: 2;
@@ -192,7 +210,7 @@
             height: 100%;
             display: inline-block;
             width: 1px;
-            border: 1px solid black;
+            border: 1px solid rgb(115, 161, 8);
         }
 
         #mainpage_menu {
@@ -212,7 +230,7 @@
         #menu_div {
             display: block;
             float: left;
-            border-right: 2px solid black;
+            border-right: 2px solid rgb(115, 161, 8);
             width: 17%;
             height: 100%;
         }
@@ -220,11 +238,9 @@
         #content_div {
             display: inline-block;
             position: relative;
-            top: 6%;
+            top: 5.5%;
             width: 82%;
-            height: 94%;
-            border-right: 2px solid black;
-            border-top: 2px solid black;
+            height: 94.5%;
         }
 
         #hor_line {
@@ -256,24 +272,27 @@
         }
 
         #post_template_div {
-            border-bottom: 2px solid black;
+            border-bottom: 2px solid rgb(115, 161, 8);
             padding: 10px;
         }
 
         #follower_template_div {
-            border-bottom: 2px solid black;
-        }
-
-        #comment_template_div {
-            border-top: 2px solid black;
+            border-bottom: 2px solid rgb(115, 161, 8);
+            padding: 10px;
         }
 
         #message_template_div {
-            border-top: 2px solid black;
+            border-top: 2px solid rgb(115, 161, 8);
+            padding: 10px;
+        }
+
+        #comment_template_div {
+            border-bottom: 2px solid rgb(115, 161, 8);
+            padding: 10px;
         }
 
         #user_top_div {
-            border-bottom: 2px solid black;
+            border-bottom: 2px solid rgb(115, 161, 8);
         }
 
         #user_top_username {
@@ -308,7 +327,7 @@
         .modal-window {
             width: 400px;
             height: 250px;
-            border: 1px solid black;
+            border: 1px solid rgb(115, 161, 8);
             display: none;
             background-color: White;
             position: fixed;
@@ -331,6 +350,89 @@
             color: red;
             /* Red color */
         }
+
+        /* Default styles */
+
+        /* Add this media query for screens up to 1440px wide */
+        @media only screen and (max-width: 670px) {
+
+            #top_bar_form {
+                display: none;
+            }
+
+
+            #menu_div {
+                display: none;
+            }
+
+            #main_div {
+                width: 100%;
+            }
+
+            #create_post_div {
+                font-size: 1.25em;
+                width: 100%;
+            }
+
+            #create_post_div>form>label {
+                display: none;
+            }
+
+            #create_post_text {
+                width: 80%;
+            }
+
+            #content_div {
+                width: 100%;
+
+            }
+
+            .dropdown {
+                display: block;
+                float: right;
+            }
+
+            #menu_item_logout {
+                position: relative;
+            }
+
+            #commented_title_div {
+                width: 100%;
+            }
+
+            #liked_title_div {
+                width: 100%;
+            }
+
+            #select_follower_page_div {
+                width: 100%;
+            }
+        }
+
+
+
+        @media only screen and (max-width: 330px) {
+
+            #create_post_text {
+                width: 60%;
+            }
+        }
+
+        @media only screen and (max-height: 667px) {
+            #content_div {
+                top: 7.5%;
+            }
+
+            #top_bar {
+                height: 7.5%;
+            }
+        }
+
+        @media only screen and (max-height: 745px) {
+            #top_bar {
+                height: 7%;
+            }
+        }
     </style>
 </head>
 
@@ -342,6 +444,19 @@
             <input type="text" id="top_bar_search" placeholder="Find a post" name='top_search_text'>
             <button id='top_bar_search_button' type="button" class="btn btn-secondary">Find</button>
         </form>
+        <div class="dropdown">
+            <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a id='menu_item_feed' class="dropdown-item" href="#">Home</a>
+                <a id='menu_item_following' class="dropdown-item" href="#">Following</a>
+                <a id='menu_item_messages' class="dropdown-item" href="#">Messages</a>
+                <a id='menu_item_liked' class="dropdown-item" href="#">Liked Posts</a>
+                <a id='menu_item_comments' class="dropdown-item" href="#">Comments</a>
+                <a id='menu_item_edit' class="dropdown-item" href="#">Edit Profile</a>
+                <a id='menu_item_logout' class="dropdown-item" href="#">Logout</a>
+            </div>
+        </div>
     </div>
     <div id='html_div'>
         <div id='main_div'>
@@ -369,21 +484,24 @@
             <div id="liked_title_div">
                 <h3>Your Liked Posts</h3>
             </div>
+            <div id="commented_title_div">
+                <h3>Your Comments</h3>
+            </div>
             <div id='create_message_div'>
                 <label for="create_message_text">Create Message</label>
-                <input type="text" id="create_message_receiver" name='receiver' placeholder="Receiver">
-                <input type="text" id="create_message_text" name='message_text' placeholder="Message" required>
+                <input type="text" class="CM_input" id="create_message_receiver" name='receiver' placeholder="Receiver">
+                <input type="text" class="CM_input" id="create_message_text" name='message_text' placeholder="Message" required>
                 <button id='create_message_button' type="button" class="btn btn-secondary">Send</button>
             </div>
             <div id='select_follower_page_div'>
-                <div id='followers_div' style='display: inline-block; text-align: center; width: 32%; border-right: 2px solid black; cursor: pointer;'>
+                <div id='followers_div' style='display: inline-block; text-align: center; width: 32%; border-right: 2px solid rgb(115, 161, 8); cursor: pointer;'>
                     Followers
                 </div>
                 <div id='following_div' style='display: inline-block; text-align: center;  width: 32%; cursor: pointer;'>
                     Following
                 </div>
-                <div id='find_users_div' style='display: inline-block; text-align: center;  width: 32%; border-left: 2px solid black; cursor: pointer;'>
-                    Find Friends
+                <div id='find_users_div' style='display: inline-block; text-align: center;  width: 32%; border-left: 2px solid rgb(115, 161, 8); cursor: pointer;'>
+                    Find
                 </div>
             </div>
             <div id='content_div' style='overflow-y: auto;'>
@@ -668,12 +786,12 @@
             if (this.readyState == 4 && this.status == 200) {
                 //alert(this.response);
                 let data = JSON.parse(this.response);
-                document.getElementById('display_comments_div').innerHTML = "<h3 style='border-bottom: 2px solid black'>Your Comments</h3>";
+                //document.getElementById('display_comments_div').innerHTML = "<h3 style='border-bottom: 2px solid black'>Your Comments</h3>";
                 if (data.length == 0) {
                     document.getElementById('display_comments_div').innerHTML += "<h5>No Comments on  Posts</h5>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('display_comments_div').innerHTML += "<div id = 'comment_template_div' ><span>Username: " + data[i]['0'] + "</span><br><span>Status: " + data[i]['1'] + "</span><br><br><span>Your Comment: </span><span>" + data[i]['comment_text'] + "</span></div>";
+                        document.getElementById('display_comments_div').innerHTML += "<div id = 'comment_template_div' ><h3>" + data[i]['0'] + "</h3><br><span>" + data[i]['1'] + "</span><br><br><span>Your Comment: </span><span>" + data[i]['comment_text'] + "</span></div>";
                     }
                 }
             }
@@ -845,10 +963,12 @@
     })
 
     function showCommented() {
+        document.getElementById('commented_title_div').style.display = 'inline-block';
         $('#display_comments_div').show();
     }
 
     function hideCommented() {
+        $('#commented_title_div').hide();
         $('#display_comments_div').hide();
     }
     $('#menu_item_edit').click(function() {

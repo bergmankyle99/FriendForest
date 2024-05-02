@@ -93,6 +93,26 @@
             font-size: 2em;
             color: rgb(12, 79, 237);
         }
+
+        @media only screen and (max-width: 920px) {
+            #FriendForestStartTitle {
+                font-size: 4em;
+            }
+
+            #menu_login {
+                width: 60%;
+            }
+
+            #menu_signup {
+                width: 60%;
+            }
+        }
+
+        @media only screen and (max-width: 390px) {
+            #FriendForestStartTitle {
+                font-size: 3em;
+            }
+        }
     </style>
 </head>
 

@@ -2,7 +2,7 @@
 /*
 *   User management
 */
-$conn = mysqli_connect('localhost', 'user', '5DCyqwJEqejFJPr', 'FriendForestDB');
+$conn = mysqli_connect('', '', '', '');
 
 function user_is_valid($username, $password)
 {
