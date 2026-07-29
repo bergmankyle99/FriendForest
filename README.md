@@ -1,342 +1,448 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<h1 align="center">
+  🌲 FriendForest
+</h1>
 
-    <title>FriendForest - Full Stack Social Media Platform</title>
+<p align="center">
+  A full-stack social media platform for connecting users, sharing posts, following friends, and communicating through private messaging.
+</p>
 
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f7f5;
-            color: #222;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-        }
+<p align="center">
+  Built with PHP, MySQL, JavaScript, AJAX, Bootstrap, Apache, and AWS.
+</p>
 
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            background: white;
-            padding: 40px;
-        }
+---
 
-        h1 {
-            font-size: 42px;
-            color: #2f7d4f;
-            margin-bottom: 5px;
-        }
+# 🚀 Overview
 
-        h2 {
-            color: #2f7d4f;
-            border-bottom: 2px solid #5da27e;
-            padding-bottom: 8px;
-            margin-top: 40px;
-        }
+FriendForest is a full-stack social networking application designed to allow users to create accounts, connect with other users, share content, and communicate through an interactive social platform.
 
-        h3 {
-            color: #3d6b4d;
-        }
+The project focuses on implementing real-world web development concepts including:
 
-        .subtitle {
-            font-size: 20px;
-            color: #555;
-        }
+- Full-stack application development
+- User authentication
+- Database design
+- Server-side programming
+- Client-server communication
+- AJAX-powered interactions
+- Cloud deployment
 
-        .badge {
-            display: inline-block;
-            background: #5da27e;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            margin: 5px;
-            font-size: 14px;
-        }
+FriendForest provides users with a personalized social experience where they can create posts, follow other users, interact with content, send messages, and manage their profiles.
 
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
+---
 
-        .card {
-            background: #f8faf8;
-            border-left: 5px solid #5da27e;
-            padding: 20px;
-            border-radius: 8px;
-        }
+# ✨ Features
 
-        .tech {
-            margin-top: 15px;
-        }
+# 🔐 Authentication System
 
-        code {
-            background: #eee;
-            padding: 3px 6px;
-            border-radius: 5px;
-        }
+FriendForest includes a complete user authentication system.
 
-        .architecture {
-            background: #1e1e1e;
-            color: #eee;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: monospace;
-        }
+Features:
 
-        ul {
-            padding-left: 25px;
-        }
+- User registration
+- User login
+- Session-based authentication
+- Logout functionality
+- Account deletion
 
-        .footer {
-            margin-top: 50px;
-            text-align: center;
-            color: #777;
-        }
+Users have their own personalized feed and protected account features.
 
-    </style>
+---
 
-</head>
+# 📝 Post System
 
-<body>
+Users can create and interact with posts.
 
-<div class="container">
+Features:
 
-    <h1>FriendForest</h1>
+- Create posts
+- View feed
+- Search posts
+- Like posts
+- Comment on posts
+- View liked posts
+- View commented posts
 
-    <p class="subtitle">
-        A full-stack social media platform built from scratch that allows users
-        to connect with friends, share posts, interact through likes and comments,
-        send messages, and manage their profiles.
-    </p>
+Posts display:
 
+- Username
+- Post content
+- Creation date
+- Like count
+- Comments
 
-    <div>
-        <span class="badge">PHP</span>
-        <span class="badge">MySQL</span>
-        <span class="badge">JavaScript</span>
-        <span class="badge">jQuery</span>
-        <span class="badge">Bootstrap</span>
-        <span class="badge">AJAX</span>
-    </div>
+---
 
+# 👥 Following System
 
-    <h2>Overview</h2>
+FriendForest allows users to build connections with other users.
 
-    <p>
-        FriendForest was developed as a full-stack web application to explore
-        real-world software development concepts including authentication,
-        relational database design, server-side programming, dynamic frontend
-        updates, and user interaction systems.
-    </p>
+Features:
 
-    <p>
-        The application provides a complete social networking experience where
-        users can create posts, follow other users, comment, like content,
-        exchange messages, and customize their profiles.
-    </p>
+- Search for users
+- Follow users
+- View followers
+- View following users
+- Unfollow users
 
+The following system allows users to create personalized feeds based on their connections.
 
-    <h2>Features</h2>
+---
 
+# 💬 Messaging System
 
-    <div class="feature-grid">
+Users can communicate privately through direct messages.
 
-        <div class="card">
-            <h3>User Authentication</h3>
-            <ul>
-                <li>User registration and login</li>
-                <li>Session-based authentication</li>
-                <li>Secure account management</li>
-            </ul>
-        </div>
+Features:
 
+- Send messages
+- Receive messages
+- View unread messages
+- View previous messages
+- Refresh message inbox
 
-        <div class="card">
-            <h3>Social Feed</h3>
-            <ul>
-                <li>Create posts</li>
-                <li>View user content</li>
-                <li>Search posts dynamically</li>
-                <li>AJAX-powered updates</li>
-            </ul>
-        </div>
+---
 
+# 👤 Profile Management
 
-        <div class="card">
-            <h3>User Connections</h3>
-            <ul>
-                <li>Follow and unfollow users</li>
-                <li>View followers</li>
-                <li>Discover users</li>
-            </ul>
-        </div>
+Users can customize and update their profiles.
 
+Features:
 
-        <div class="card">
-            <h3>Interactions</h3>
-            <ul>
-                <li>Like posts</li>
-                <li>Comment on posts</li>
-                <li>View liked content</li>
-            </ul>
-        </div>
+- Change username
+- Update first name
+- Update last name
+- Update email
+- Update bio
+- Change password
 
+---
 
-        <div class="card">
-            <h3>Messaging</h3>
-            <ul>
-                <li>Send direct messages</li>
-                <li>View unread messages</li>
-                <li>Track message history</li>
-            </ul>
-        </div>
+# 🛠 Technology Stack
 
+# Frontend
 
-        <div class="card">
-            <h3>Profiles</h3>
-            <ul>
-                <li>Edit personal information</li>
-                <li>Update password/email</li>
-                <li>Manage user bio</li>
-            </ul>
-        </div>
+## HTML + CSS + JavaScript
 
-    </div>
+Used for:
 
+- User interface development
+- Dynamic content updates
+- Form handling
+- User interactions
 
+---
 
-    <h2>Technology Stack</h2>
+## Bootstrap
 
-    <h3>Frontend</h3>
+Used for:
 
-    <ul>
-        <li>HTML5</li>
-        <li>CSS3</li>
-        <li>JavaScript</li>
-        <li>jQuery</li>
-        <li>Bootstrap</li>
-    </ul>
+- Responsive layouts
+- UI components
+- Buttons
+- Modals
+- Mobile compatibility
 
+---
 
-    <h3>Backend</h3>
+## jQuery + AJAX
 
-    <ul>
-        <li>PHP</li>
-        <li>Apache Web Server</li>
-    </ul>
+Used for:
 
+- Asynchronous requests
+- Dynamic page updates
+- Loading feeds without refreshes
+- Messaging functionality
+- User interactions
 
-    <h3>Database</h3>
+---
 
-    <ul>
-        <li>MySQL</li>
-        <li>Relational database design</li>
-        <li>Foreign key relationships</li>
-    </ul>
+# Backend
 
+## PHP
 
+Used for:
 
-    <h2>Application Architecture</h2>
+- Server-side application logic
+- Authentication
+- Request handling
+- Database communication
+- Processing user actions
 
-    <div class="architecture">
+PHP handles functionality including:
 
-        Browser
-        <br>
+- Creating posts
+- Managing users
+- Sending messages
+- Updating profiles
+- Following users
+
+---
+
+# Database
+
+## MySQL
+
+Stores application data including:
+
+- User accounts
+- Posts
+- Comments
+- Likes
+- Followers
+- Messages
+
+Database concepts implemented:
+
+- Relational database design
+- Primary keys
+- Foreign keys
+- User relationships
+- Persistent data storage
+
+---
+
+# 🏗 Architecture
+
+```
+                         User
+                           |
+                           |
+                    Web Browser
+                           |
+                           |
+                    Apache Server
+                           |
+                           |
+                         PHP
+                           |
+              -------------------------
+              |                       |
+           MySQL                  JavaScript
+              |                       |
+       Application Data          AJAX Requests
+
+```
+
+---
+
+# ☁️ Deployment
+
+FriendForest is deployed using AWS infrastructure.
+
+Deployment includes:
+
+- AWS EC2
+- Apache Web Server
+- PHP Runtime
+- MySQL Database
+- Linux Server Environment
+
+Application flow:
+
+```
+Browser
+
+   |
+
+Apache Web Server
+
+   |
+
+PHP Application
+
+   |
+
+MySQL Database
+```
+
+---
+
+# 🔌 Application Flow
+
+## Authentication Flow
+
+```
+User Registration
+
         |
-        <br>
-        | AJAX Requests
-        <br>
+
+Database Storage
+
         |
-        <br>
-        PHP Backend
-        <br>
+
+User Login
+
         |
-        <br>
-        MySQL Database
 
-    </div>
+Session Creation
 
+        |
 
-    <h2>Database Design</h2>
+Application Access
+```
 
-    <p>
-        FriendForest uses a relational database structure designed around
-        several interconnected entities:
-    </p>
+---
 
-    <ul>
-        <li><strong>Users:</strong> Stores account information and profiles.</li>
-        <li><strong>Posts:</strong> Stores user-created content.</li>
-        <li><strong>Comments:</strong> Stores discussions attached to posts.</li>
-        <li><strong>Likes:</strong> Tracks user interactions.</li>
-        <li><strong>Followers:</strong> Manages social relationships.</li>
-        <li><strong>Messages:</strong> Stores direct communication.</li>
-    </ul>
+## Post Creation Flow
 
+```
+User Creates Post
 
+        |
 
-    <h2>Development Challenges</h2>
+AJAX Request
 
+        |
 
-    <h3>Dynamic Content Updates</h3>
+PHP Backend
 
-    <p>
-        Creating a responsive social feed required implementing AJAX communication
-        between the frontend and backend, allowing users to interact with content
-        without refreshing the entire page.
-    </p>
+        |
 
+MySQL Insert
 
-    <h3>Relational Data Modeling</h3>
+        |
 
-    <p>
-        Designing relationships between users, posts, comments, likes, followers,
-        and messages required careful database planning and SQL query design.
-    </p>
+Updated Feed
+```
 
+---
 
-    <h3>Authentication and Sessions</h3>
+## Messaging Flow
 
-    <p>
-        The application uses server-side sessions to maintain authentication state
-        and protect user functionality.
-    </p>
+```
+User Sends Message
 
+        |
 
+AJAX Request
 
-    <h2>Future Improvements</h2>
+        |
 
-    <ul>
-        <li>Migrate frontend to React/Next.js</li>
-        <li>Create REST API endpoints</li>
-        <li>Add real-time messaging with WebSockets</li>
-        <li>Add image uploads</li>
-        <li>Improve UI/UX design</li>
-        <li>Add notifications</li>
-        <li>Deploy using cloud infrastructure</li>
-    </ul>
+PHP Processing
 
+        |
 
+Database Storage
 
-    <h2>Purpose</h2>
+        |
 
-    <p>
-        FriendForest was created to gain practical experience building a complete
-        full-stack application. The project demonstrates knowledge of backend
-        development, database architecture, authentication systems, frontend
-        interactivity, and application design.
-    </p>
+Recipient Inbox
+```
 
+---
 
-    <div class="footer">
-        Built by Kyle Bergman
-    </div>
+# 💻 Running Locally
 
+## Requirements
 
-</div>
+Install:
 
-</body>
-</html>
+- Apache
+- PHP 8+
+- MySQL
+- Web Browser
+
+---
+
+# Clone Repository
+
+```bash
+git clone https://github.com/bergmankyle99/FriendForest.git
+
+cd FriendForest
+```
+
+---
+
+# Database Setup
+
+Create the database:
+
+```sql
+CREATE DATABASE FriendForest;
+```
+
+Import the database:
+
+```bash
+mysql -u username -p < friendforest.sql
+```
+
+---
+
+# Database Configuration
+
+Update your database connection settings:
+
+```php
+$host = "localhost";
+$username = "your_username";
+$password = "your_password";
+$database = "FriendForest";
+```
+
+---
+
+# Start Application
+
+Place the project inside your Apache web directory.
+
+Example:
+
+```
+/var/www/html/FriendForest
+```
+
+Open:
+
+```
+http://localhost/FriendForest
+```
+
+---
+
+# 📚 Skills Demonstrated
+
+FriendForest demonstrates experience with:
+
+- Full-stack web development
+- PHP backend development
+- MySQL database architecture
+- AJAX communication
+- Authentication systems
+- Session management
+- Responsive UI development
+- Cloud deployment
+- Linux server administration
+
+---
+
+# 🔮 Future Improvements
+
+Potential improvements:
+
+- React frontend migration
+- REST API backend
+- Real-time messaging with WebSockets
+- Image uploads
+- Notifications
+- Friend request system
+- Improved search functionality
+- Enhanced UI/UX
+- Mobile application support
+
+---
+
+# 🎯 Project Purpose
+
+FriendForest was created to explore the development of a complete social networking platform while applying practical software engineering principles.
+
+This project demonstrates the ability to design and build a complete application including:
+
+- Frontend interfaces
+- Backend logic
+- Database architecture
+- User authentication
+- Deployment infrastructure
+
+FriendForest combines traditional web development technologies with modern application design practices to create a complete social media experience.
