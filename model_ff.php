@@ -7,13 +7,18 @@ $conn = mysqli_connect('', '', '', '');
 function user_is_valid($username, $password)
 {
     global $conn;
-    $pass_hash = sha1($password);
-    $sql = "Select * from FF_Users where username = '$username' AND password = '$pass_hash'";
+    $sql = "Select password From FF_Users WHERE username = '$username'";
     $result = mysqli_query($conn, $sql);
-    if (mysqli_num_rows($result))
-        return true;
-    else
-        return false;
+    if(mysqli_num_rows($result) == 1){
+        $row = mysqli_fetch_assoc($result);
+        if(password_verify($password, $row['password'])){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    return false;
 }
 
 function user_exists_UE($username, $email)
@@ -56,7 +61,7 @@ function signup_new_user($username, $fname, $lname, $email, $pass)
     if (!user_exists_UE($username, $email)) {
         global $conn;
         $current_date = date("Ymd");
-        $pass_hash = sha1($pass);
+        $pass_hash = password_hash($pass, PASSWORD_DEFAULT);
         $sql = "INSERT INTO FF_Users (username, firstname, lastname, email, password, bio, datejoined) VALUES ('$username', '$fname', '$lname', '$email','$pass_hash', '','$current_date')";
         $result = mysqli_query($conn, $sql);
     }

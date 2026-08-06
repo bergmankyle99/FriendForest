@@ -448,13 +448,13 @@
             <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a id='menu_item_feed' class="dropdown-item" href="#">Home</a>
-                <a id='menu_item_following' class="dropdown-item" href="#">Following</a>
-                <a id='menu_item_messages' class="dropdown-item" href="#">Messages</a>
-                <a id='menu_item_liked' class="dropdown-item" href="#">Liked Posts</a>
-                <a id='menu_item_comments' class="dropdown-item" href="#">Comments</a>
-                <a id='menu_item_edit' class="dropdown-item" href="#">Edit Profile</a>
-                <a id='menu_item_logout' class="dropdown-item" href="#">Logout</a>
+                <a id='menu_item_feed_mobile' class="dropdown-item" href="#">Home</a>
+                <a id='menu_item_following_mobile' class="dropdown-item" href="#">Following</a>
+                <a id='menu_item_messages_mobile' class="dropdown-item" href="#">Messages</a>
+                <a id='menu_item_liked_mobile' class="dropdown-item" href="#">Liked Posts</a>
+                <a id='menu_item_comments_mobile' class="dropdown-item" href="#">Comments</a>
+                <a id='menu_item_edit_mobile' class="dropdown-item" href="#">Edit Profile</a>
+                <a id='menu_item_logout_mobile' class="dropdown-item" href="#">Logout</a>
             </div>
         </div>
     </div>
@@ -608,12 +608,7 @@
             </div>
         </div>
     </div>
-</body>
-
-
-</html>
-
-<script>
+    <script>
     $('#top_bar_search_button').click(function() {
         var xhttp = new XMLHttpRequest(); // AJAX code for the SendMessage command. The command will be sent to test_send_message.php.
         xhttp.onreadystatechange = function() {
@@ -902,16 +897,16 @@
     });
 
 
-    $('#menu_item_feed').click(function() {
+    $('#menu_item_feed, #menu_item_feed_mobile').click(function() {
         hideAll();
         showFeed();
         get_posts();
     })
-    $('#menu_item_following').click(function() {
+    $('#menu_item_following,#menu_item_following_mobile').click(function() {
         hideAll();
         showFollowers();
     })
-    $('#menu_item_messages').click(function() {
+    $('#menu_item_messages, #menu_item_messages_mobile').click(function() {
         hideAll();
         showMessages();
         var xhttp = new XMLHttpRequest(); // AJAX code for the SendMessage command. The command will be sent to test_send_message.php.
@@ -937,7 +932,7 @@
         query += "&readstate=0";
         xhttp.send(query);
     })
-    $('#menu_item_liked').click(function() {
+    $('#menu_item_liked, #menu_item_liked_mobile').click(function() {
         //alert(this.innerHTML);
         hideAll();
         showLiked();
@@ -955,7 +950,7 @@
         document.getElementById('display_likes_div').innerHTML = '';
 
     }
-    $('#menu_item_comments').click(function() {
+    $('#menu_item_comments, #menu_item_comments_mobile').click(function() {
         //alert(this.innerHTML);
         hideAll();
         showCommented();
@@ -971,7 +966,7 @@
         $('#commented_title_div').hide();
         $('#display_comments_div').hide();
     }
-    $('#menu_item_edit').click(function() {
+    $('#menu_item_edit, #menu_item_edit_mobile').click(function() {
         hideAll();
         showEdit();
         get_user_profile();
@@ -1389,3 +1384,8 @@
         xhttp.send(query);
     });
 </script>
+</body>
+
+
+</html>
+
