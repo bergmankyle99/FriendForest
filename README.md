@@ -1,7 +1,7 @@
 <h1 align="center">
   🌲 FriendForest
 </h1>
-
+<p align="center">https://friendforest.ca/</p>
 <p align="center">
   A full-stack social media platform for connecting users, sharing posts, following friends, and communicating through private messaging.
 </p>
