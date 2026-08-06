@@ -28,7 +28,7 @@ if ($_POST['page'] == 'StartPage') {
                 // This variable will be used in 'view_startpage.php'.
                 $error_msg_username = '* Wrong username, or';
                 $error_msg_password = '* Wrong password'; // Set an error message into a variable.
-                
+
                 $login_error_alert = 'Log In Error: Please Try Again';
                 // This variable will used in the form in 'view_startpage.php'.
                 include('view_startpage_ff.php');
@@ -43,7 +43,7 @@ if ($_POST['page'] == 'StartPage') {
         case 'SignUp':  // With username, password, email, some other information
             if (!user_exists_UE($_POST['username'], $_POST['email'])) {
                 $display_modal_window = 'login';
-                signup_new_user($_POST['username'], $_POST['firstname'], $_POST['lastname'],  $_POST['email'], $_POST['password']);
+                signup_new_user($_POST['username'], $_POST['firstname'], $_POST['lastname'], $_POST['email'], $_POST['password']);
                 $login_error_alert = 'Sign Up Successful: Please Log In with your Account';
                 follow_user($_POST['username'], $_POST['username'], "");
                 include('view_startpage_ff.php');
@@ -119,10 +119,21 @@ else if ($_POST['page'] == 'MainPage') {
             echo json_encode(search_posts($_POST['search_text']));
             break;
         case 'EditUsername':
-            echo edit_username($_SESSION[$sess_user], $_POST['new_username']);
+
+            $result = edit_username(
+                $_SESSION[$sess_user],
+                $_POST['new_username']
+            );
+
+            if ($result) {
+                $_SESSION[$sess_user] = $_POST['new_username'];
+            }
+
+            echo json_encode($result);
+
             break;
         case 'EditFirstname':
-            echo  json_encode(edit_firstname($_SESSION[$sess_user], $_POST['new_fname']));
+            echo json_encode(edit_firstname($_SESSION[$sess_user], $_POST['new_fname']));
             break;
         case 'EditLastname':
             echo json_encode(edit_lastname($_SESSION[$sess_user], $_POST['new_lname']));

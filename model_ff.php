@@ -77,6 +77,17 @@ function user_exists_UE($username, $email)
     return $stmt->get_result()->num_rows > 0;
 }
 
+function username_taken($username)
+{
+    $stmt = db_query(
+        "SELECT username FROM FF_Users WHERE username = ?",
+        "s",
+        [$username]
+    );
+
+    return $stmt->get_result()->num_rows > 0;
+}
+
 
 /*
  * Check if email exists
@@ -775,78 +786,40 @@ function get_following($user)
 }
 function edit_username($username, $newusername)
 {
+    global $conn;
+
+    // Already taken?
     if (user_exists_U($newusername)) {
         return false;
     }
 
+    // ----- critical part -----
+    $conn->query("SET FOREIGN_KEY_CHECKS = 0");
 
-    global $conn;
-    $conn->begin_transaction();
+    // 1. Update all related tables
+    update_tables($username, $newusername);
 
-    try {
+    // 2. Update the main Users table
+    $stmt = $conn->prepare(
+        "UPDATE FF_Users SET username = ? WHERE username = ?"
+    );
+    $stmt->bind_param("ss", $newusername, $username);
+    $stmt->execute();
 
+    $success = ($stmt->affected_rows > 0);
 
-        // Update main user table
-        $stmt = $conn->prepare(
-            "UPDATE FF_Users 
-         SET username = ?
-         WHERE username = ?"
-        );
+    // Re-enable foreign key checks
+    $conn->query("SET FOREIGN_KEY_CHECKS = 1");
+    // -------------------------
 
-
-        $stmt->bind_param(
-            "ss",
-            $newusername,
-            $username
-        );
-
-
-        $stmt->execute();
-
-
-        // Check if username changed successfully
-        $stmt = $conn->prepare(
-            "SELECT username 
-         FROM FF_Users 
-         WHERE username = ?"
-        );
-
-
-        $stmt->bind_param(
-            "s",
-            $newusername
-        );
-
-
-        $stmt->execute();
-
-
-        $result = $stmt->get_result();
-
-
-        if ($result->num_rows) {
-
-            $data = [];
-
-            $data[0] = mysqli_fetch_assoc($result);
-
-            update_tables($username, $newusername);
-
-            return $data;
-        }
-        $conn->commit();
-
-    } catch (Exception $e) {
-
-        $conn->rollback();
-
+    if (!$success) {
+        return false;
     }
 
-
-    return false;
+    return [
+        ["username" => $newusername]
+    ];
 }
-
-
 
 function update_tables($username, $newusername)
 {
