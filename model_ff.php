@@ -1,259 +1,664 @@
 <?php
 /*
-*   User management
-*/
+ *   User management
+ */
+
 $conn = mysqli_connect('', '', '', '');
 
-function user_is_valid($username, $password)
+if (!$conn) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
+$conn->set_charset("utf8mb4");
+
+/*
+ * Helper function for prepared statements
+ */
+function db_query($sql, $types = "", $params = [])
 {
     global $conn;
-    $sql = "Select password From FF_Users WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    if(mysqli_num_rows($result) == 1){
-        $row = mysqli_fetch_assoc($result);
-        if(password_verify($password, $row['password'])){
+
+    $stmt = $conn->prepare($sql);
+
+    if (!$stmt) {
+        die("SQL Prepare Error: " . $conn->error);
+    }
+
+    if ($types != "") {
+        $stmt->bind_param($types, ...$params);
+    }
+
+    $stmt->execute();
+
+    return $stmt;
+}
+
+
+/*
+ * Check username/password login
+ */
+function user_is_valid($username, $password)
+{
+    $stmt = db_query(
+        "SELECT password FROM FF_Users WHERE username = ?",
+        "s",
+        [$username]
+    );
+
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 1) {
+
+        $row = $result->fetch_assoc();
+
+        if (password_verify($password, $row['password'])) {
             return true;
         }
-        else{
-            return false;
-        }
+
     }
+
     return false;
 }
 
+
+/*
+ * Check if username OR email exists
+ */
 function user_exists_UE($username, $email)
 {
-    global $conn;
-    $sql = "Select * from FF_Users where username = '$username' OR email = '$email'";
-    $result = mysqli_query($conn, $sql);
-    if (mysqli_num_rows($result))
-        return true;
-    else
-        return false;
+    $stmt = db_query(
+        "SELECT * FROM FF_Users WHERE username = ? OR email = ?",
+        "ss",
+        [
+            $username,
+            $email
+        ]
+    );
+
+    return $stmt->get_result()->num_rows > 0;
 }
+
+
+/*
+ * Check if email exists
+ */
 function check_email($email)
 {
-    global $conn;
-    $sql = "Select * from FF_Users where email = '$email'";
-    $result = mysqli_query($conn, $sql);
-    if (mysqli_num_rows($result))
-        return true;
-    else
-        return false;
+    $stmt = db_query(
+        "SELECT * FROM FF_Users WHERE email = ?",
+        "s",
+        [$email]
+    );
+
+    return $stmt->get_result()->num_rows > 0;
 }
 
+
+/*
+ * Check if username exists
+ */
 function user_exists_U($username)
 {
-    global $conn;
-    $sql = "Select * from FF_Users where username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    if (mysqli_num_rows($result))
-        return true;
-    else
-        return false;
+    $stmt = db_query(
+        "SELECT * FROM FF_Users WHERE username = ?",
+        "s",
+        [$username]
+    );
+
+    return $stmt->get_result()->num_rows > 0;
 }
+
+
+/*
+ * Create new user
+ */
 function signup_new_user($username, $fname, $lname, $email, $pass)
 {
-    if ($username == '' or $fname == '' or $lname == '' or $email == '' or $pass == '') {
+
+    if (
+        $username == '' ||
+        $fname == '' ||
+        $lname == '' ||
+        $email == '' ||
+        $pass == ''
+    ) {
         return false;
     }
-    $result = false;
-    if (!user_exists_UE($username, $email)) {
-        global $conn;
-        $current_date = date("Ymd");
-        $pass_hash = password_hash($pass, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO FF_Users (username, firstname, lastname, email, password, bio, datejoined) VALUES ('$username', '$fname', '$lname', '$email','$pass_hash', '','$current_date')";
-        $result = mysqli_query($conn, $sql);
+
+
+    if (user_exists_UE($username, $email)) {
+        return false;
     }
-    return $result;
+
+
+    $current_date = date("Ymd");
+
+    $pass_hash = password_hash(
+        $pass,
+        PASSWORD_DEFAULT
+    );
+
+
+    $stmt = db_query(
+        "
+        INSERT INTO FF_Users
+        (
+            username,
+            firstname,
+            lastname,
+            email,
+            password,
+            bio,
+            datejoined
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ",
+        "sssssss",
+        [
+            $username,
+            $fname,
+            $lname,
+            $email,
+            $pass_hash,
+            "",
+            $current_date
+        ]
+    );
+
+
+    return $stmt->affected_rows > 0;
 }
 
+/*
+ * Delete user and related data
+ */
 function unsubscribe_user($username)
 {
-    global $conn;
-    $sql = "DELETE FROM FF_Users WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
 
-    $sql = "DELETE FROM FF_Comments WHERE username = '$username'";
-    mysqli_query($conn, $sql);
+    $tables = [
+        "FF_Comments" => "username",
+        "FF_Following" => "username",
+        "FF_Messages" => "sender",
+        "FF_Status" => "username",
+        "FF_StatusLikes" => "username",
+        "FF_Users" => "username"
+    ];
 
-    $sql = "DELETE FROM FF_Following WHERE username = '$username'";
-    mysqli_query($conn, $sql);
 
-    $sql = "DELETE FROM FF_Following WHERE following = '$username'";
-    mysqli_query($conn, $sql);
+    foreach ($tables as $table => $column) {
 
-    $sql = "DELETE FROM FF_Messages WHERE sender = '$username'";
-    mysqli_query($conn, $sql);
+        db_query(
+            "DELETE FROM $table WHERE $column = ?",
+            "s",
+            [$username]
+        );
 
-    $sql = "DELETE FROM FF_Messages WHERE receiver = '$username'";
-    mysqli_query($conn, $sql);
+    }
 
-    $sql = "DELETE FROM FF_Status WHERE username = '$username'";
-    mysqli_query($conn, $sql);
 
-    $sql = "DELETE FROM FF_StatusLikes WHERE username = '$username'";
-    mysqli_query($conn, $sql);
+    // Delete users they were following
+    db_query(
+        "DELETE FROM FF_Following WHERE following = ?",
+        "s",
+        [$username]
+    );
+
+
+    // Delete messages they received
+    db_query(
+        "DELETE FROM FF_Messages WHERE receiver = ?",
+        "s",
+        [$username]
+    );
+
 }
 
+
+/*
+ * Follow another user
+ */
 function follow_user($username, $following, $user_term)
 {
-    if (user_exists_U($username) and user_exists_U($following)) {
-        global $conn;
-        $sql = "INSERT INTO FF_Following (username, following) VALUES ('$username', '$following')";
-        $result = mysqli_query($conn, $sql);
+
+    if (
+        user_exists_U($username) &&
+        user_exists_U($following)
+    ) {
+
+        db_query(
+            "
+            INSERT INTO FF_Following
+            (username, following)
+            VALUES (?, ?)
+            ",
+            "ss",
+            [
+                $username,
+                $following
+            ]
+        );
+
     }
+
+
     return find_users($username, $user_term);
 }
 
+
+/*
+ * Find users
+ */
 function find_users($username, $user_term)
 {
-    global $conn;
-    $sql = "Select username, firstname, lastname from FF_Users WHERE (username NOT IN (SELECT following FROM FF_Following WHERE username = '$username' OR following = '$username')) AND ((username LIKE '%$user_term%') OR (firstname LIKE '%$user_term%') OR (lastname LIKE '%$user_term%')) ORDER BY username DESC";
-    $result = mysqli_query($conn, $sql);
+
+    $search = "%" . $user_term . "%";
+
+
+    $stmt = db_query(
+        "
+        SELECT username, firstname, lastname
+        FROM FF_Users
+        WHERE username NOT IN
+        (
+            SELECT following
+            FROM FF_Following
+            WHERE username = ?
+            OR following = ?
+        )
+        AND
+        (
+            username LIKE ?
+            OR firstname LIKE ?
+            OR lastname LIKE ?
+        )
+        ORDER BY username DESC
+        ",
+        "sssss",
+        [
+            $username,
+            $username,
+            $search,
+            $search,
+            $search
+        ]
+    );
+
+
+    $result = $stmt->get_result();
+
     $data = [];
     $i = 0;
-    if (mysqli_num_rows($result)) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            if ($row['username'] != $username) {
-                array_push($row, $user_term);
-                $data[$i++] = $row;
-            }
-        }
-    }
-    return $data;
-}
-function create_post($u, $text)
-{
-    $result = false;
-    global $conn;
-    $current_date = date("Y-m-d H:i:s");
-    $sql = "INSERT INTO FF_Status (username, statustext, statusdate, likeCount) VALUES ('$u', '$text', '$current_date',0)";
-    $result = mysqli_query($conn, $sql);
-    if ($result == true) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
-function get_posts($username)
-{
-    global $conn;
-    $sql = "Select * from FF_Status where username IN (SELECT following FROM FF_Following WHERE username = '$username') ORDER BY StatusDate DESC";
-    $result = mysqli_query($conn, $sql);
-    $data = [];
-    $i = 0;
-    if (mysqli_num_rows($result) > 0) {
-        while ($row = mysqli_fetch_assoc($result)) {
+
+
+    while ($row = $result->fetch_assoc()) {
+
+        if ($row['username'] != $username) {
+
+            array_push($row, $user_term);
+
             $data[$i++] = $row;
+
         }
+
     }
+
+
     return $data;
 }
 
+
+
+/*
+ * Create post
+ */
+function create_post($u, $text)
+{
+
+    $current_date = date("Y-m-d H:i:s");
+
+
+    $stmt = db_query(
+        "
+        INSERT INTO FF_Status
+        (
+            username,
+            statustext,
+            statusdate,
+            likeCount
+        )
+        VALUES (?, ?, ?, 0)
+        ",
+        "sss",
+        [
+            $u,
+            $text,
+            $current_date
+        ]
+    );
+
+
+    if ($stmt->affected_rows > 0) {
+        return 0;
+    }
+
+
+    return 1;
+}
+
+
+
+/*
+ * Get posts from followed users
+ */
+function get_posts($username)
+{
+
+    $stmt = db_query(
+        "
+        SELECT *
+        FROM FF_Status
+        WHERE username IN
+        (
+            SELECT following
+            FROM FF_Following
+            WHERE username = ?
+        )
+        ORDER BY StatusDate DESC
+        ",
+        "s",
+        [$username]
+    );
+
+
+    $result = $stmt->get_result();
+
+
+    $data = [];
+    $i = 0;
+
+
+    while ($row = $result->fetch_assoc()) {
+
+        $data[$i++] = $row;
+
+    }
+
+
+    return $data;
+}
+
+
+
+/*
+ * Like post
+ */
 function like_post($username, $status_id, $current_likes)
 {
-    //insert into messages table
-    // if (!user_exists($receiver)) {
-    //     //error, return
-    //     return "Invalid Recipient";
-    // }
-    global $conn;
-    $sql = "Select * FROM FF_StatusLikes WHERE username = '$username' AND status_id = $status_id";
-    $result = mysqli_query($conn, $sql);
-    if (mysqli_num_rows($result) == 0) {
-        $sql = "INSERT INTO FF_StatusLikes (status_id, Username) VALUES ($status_id, '$username');";
-        $result = mysqli_query($conn, $sql);
+
+    $stmt = db_query(
+        "
+        SELECT *
+        FROM FF_StatusLikes
+        WHERE username = ?
+        AND status_id = ?
+        ",
+        "si",
+        [
+            $username,
+            $status_id
+        ]
+    );
+
+
+    $result = $stmt->get_result();
+
+
+    if ($result->num_rows == 0) {
+
+
+        db_query(
+            "
+            INSERT INTO FF_StatusLikes
+            (
+                status_id,
+                username
+            )
+            VALUES (?, ?)
+            ",
+            "is",
+            [
+                $status_id,
+                $username
+            ]
+        );
+
+
         $current_likes++;
-        $sql = "UPDATE FF_Status SET likeCount = $current_likes WHERE status_id = $status_id";
-        $result = mysqli_query($conn, $sql);
+
+
+        db_query(
+            "
+            UPDATE FF_Status
+            SET likeCount = ?
+            WHERE status_id = ?
+            ",
+            "ii",
+            [
+                $current_likes,
+                $status_id
+            ]
+        );
+
     }
+
+
     return $current_likes;
 }
 
 function get_comments($status_id)
 {
     global $conn;
-    $sql = "Select * from FF_Comments WHERE status_id = '$status_id'";
-    $result = mysqli_query($conn, $sql);
+
+    $stmt = $conn->prepare(
+        "SELECT * FROM FF_Comments WHERE status_id = ?"
+    );
+
+    $stmt->bind_param("i", $status_id);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
     $data = [];
     $i = 0;
-    if (mysqli_num_rows($result)) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $data[$i++] = $row;
-        }
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[$i++] = $row;
     }
+
     return $data;
 }
+
 
 function get_commented($username)
 {
     global $conn;
-    $sql = "Select * from FF_Comments WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
+
+    $stmt = $conn->prepare(
+        "SELECT * FROM FF_Comments WHERE username = ?"
+    );
+
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
     $data = [];
     $i = 0;
-    if (mysqli_num_rows($result)) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $status_id = $row['status_id'];
-            $sql = "Select username as status_user, statustext from FF_Status WHERE status_id = $status_id";
-            $result2 = mysqli_query($conn, $sql);
-            $row2 = mysqli_fetch_assoc($result2);
+
+
+    while ($row = mysqli_fetch_assoc($result)) {
+
+        $status_id = $row['status_id'];
+
+
+        $stmt2 = $conn->prepare(
+            "SELECT username AS status_user, statustext 
+             FROM FF_Status 
+             WHERE status_id = ?"
+        );
+
+        $stmt2->bind_param("i", $status_id);
+        $stmt2->execute();
+
+        $result2 = $stmt2->get_result();
+
+        if ($row2 = mysqli_fetch_assoc($result2)) {
+
             array_push($row, $row2['status_user']);
             array_push($row, $row2['statustext']);
+
             $data[$i++] = $row;
         }
     }
+
     return $data;
 }
+
+
 function get_liked($username)
 {
     global $conn;
-    $sql = "Select * from FF_Status WHERE status_id IN (SELECT status_id FROM FF_StatusLikes WHERE  username = '$username') ORDER BY StatusDate DESC";
-    $result = mysqli_query($conn, $sql);
+
+
+    $stmt = $conn->prepare(
+        "SELECT * 
+         FROM FF_Status 
+         WHERE status_id IN 
+         (
+            SELECT status_id 
+            FROM FF_StatusLikes 
+            WHERE username = ?
+         )
+         ORDER BY StatusDate DESC"
+    );
+
+
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+
+
+    $result = $stmt->get_result();
+
+
     $data = [];
     $i = 0;
-    if (mysqli_num_rows($result)) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $data[$i++] = $row;
-        }
+
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[$i++] = $row;
     }
+
+
     return $data;
 }
+
+
 
 function make_comment($status_id, $username, $comment_text)
 {
     global $conn;
-    $sql = "INSERT INTO FF_Comments (status_id, username, comment_text) VALUES ($status_id, '$username', '$comment_text');";
-    $result = mysqli_query($conn, $sql);
-    return $result;
+
+
+    $stmt = $conn->prepare(
+        "INSERT INTO FF_Comments
+        (
+            status_id,
+            username,
+            comment_text
+        )
+        VALUES (?, ?, ?)"
+    );
+
+
+    $stmt->bind_param(
+        "iss",
+        $status_id,
+        $username,
+        $comment_text
+    );
+
+
+    return $stmt->execute();
 }
+
+
 
 function get_user_profile($username)
 {
     global $conn;
-    $sql = "Select username, firstname, lastname, email, bio from FF_Users where username = '$username'";
-    $result = mysqli_query($conn, $sql);
+
+
+    $stmt = $conn->prepare(
+        "SELECT username, firstname, lastname, bio
+         FROM FF_Users
+         WHERE username = ?"
+    );
+
+
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+
+
+    $result = $stmt->get_result();
+
+
     $data = [];
-    if (mysqli_num_rows($result)) {
+
+
+    if ($result->num_rows) {
+
         $data[0] = mysqli_fetch_assoc($result);
+
         return $data;
-    } else
-        return false;
+    }
+
+
+    return false;
 }
+
+
 
 function search_posts($term)
 {
     global $conn;
-    $sql = "Select * from FF_Status where (StatusText LIKE '%$term%') ORDER BY StatusDate DESC";
-    $result = mysqli_query($conn, $sql);
+
+
+    $search = "%" . $term . "%";
+
+
+    $stmt = $conn->prepare(
+        "SELECT *
+         FROM FF_Status
+         WHERE StatusText LIKE ?
+         ORDER BY StatusDate DESC"
+    );
+
+
+    $stmt->bind_param("s", $search);
+    $stmt->execute();
+
+
+    $result = $stmt->get_result();
+
+
     $data = [];
     $i = 0;
-    if (mysqli_num_rows($result)) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $data[$i++] = $row;
-        }
+
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[$i++] = $row;
     }
+
+
     return $data;
 }
 
@@ -262,11 +667,31 @@ function search_posts($term)
 function unfollow_user($username, $following)
 {
     global $conn;
-    $sql = "DELETE FROM FF_Following WHERE username = '$username' AND following = '$following'";
-    $result = mysqli_query($conn, $sql);
-    if ($result)
+
+
+    $stmt = $conn->prepare(
+        "DELETE FROM FF_Following
+         WHERE username = ?
+         AND following = ?"
+    );
+
+
+    $stmt->bind_param(
+        "ss",
+        $username,
+        $following
+    );
+
+
+    $result = $stmt->execute();
+
+
+    if ($result) {
         return get_following($username);
-    else return $result;
+    }
+
+
+    return false;
 }
 
 
@@ -274,30 +699,78 @@ function unfollow_user($username, $following)
 function get_followers($user)
 {
     global $conn;
-    $sql = "Select username from FF_Following WHERE username != '$user' AND following = '$user'";
-    $result = mysqli_query($conn, $sql);
+
+
+    $stmt = $conn->prepare(
+        "SELECT username
+         FROM FF_Following
+         WHERE username != ?
+         AND following = ?"
+    );
+
+
+    $stmt->bind_param(
+        "ss",
+        $user,
+        $user
+    );
+
+
+    $stmt->execute();
+
+
+    $result = $stmt->get_result();
+
+
     $data = [];
     $i = 0;
-    if (mysqli_num_rows($result)) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $data[$i++] = $row;
-        }
+
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[$i++] = $row;
     }
+
+
     return $data;
 }
+
+
 
 function get_following($user)
 {
     global $conn;
-    $sql = "Select following from FF_Following WHERE following != '$user' AND username = '$user'";
-    $result = mysqli_query($conn, $sql);
+
+
+    $stmt = $conn->prepare(
+        "SELECT following
+         FROM FF_Following
+         WHERE following != ?
+         AND username = ?"
+    );
+
+
+    $stmt->bind_param(
+        "ss",
+        $user,
+        $user
+    );
+
+
+    $stmt->execute();
+
+
+    $result = $stmt->get_result();
+
+
     $data = [];
     $i = 0;
-    if (mysqli_num_rows($result)) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $data[$i++] = $row;
-        }
+
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[$i++] = $row;
     }
+
+
     return $data;
 }
 function edit_username($username, $newusername)
@@ -305,176 +778,483 @@ function edit_username($username, $newusername)
     if (user_exists_U($newusername)) {
         return false;
     }
+
+
     global $conn;
-    $sql = "SET FOREIGN_KEY_CHECKS=0;";
-    $result = mysqli_query($conn, $sql);
-    $sql = "UPDATE FF_Users SET username = '$newusername' WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $sql = "Select username from FF_Users where username = '$newusername'";
-    $result = mysqli_query($conn, $sql);
-    $data = [];
-    if (mysqli_num_rows($result)) {
-        $data[0] = mysqli_fetch_assoc($result);
-        update_tables($username, $newusername);
-        $sql = "SET FOREIGN_KEY_CHECKS=1;";
-        $result = mysqli_query($conn, $sql);
-        return $data;
-    } else {
-        $sql = "SET FOREIGN_KEY_CHECKS=1;";
-        $result = mysqli_query($conn, $sql);
-        return false;
+    $conn->begin_transaction();
+
+    try {
+
+
+        // Update main user table
+        $stmt = $conn->prepare(
+            "UPDATE FF_Users 
+         SET username = ?
+         WHERE username = ?"
+        );
+
+
+        $stmt->bind_param(
+            "ss",
+            $newusername,
+            $username
+        );
+
+
+        $stmt->execute();
+
+
+        // Check if username changed successfully
+        $stmt = $conn->prepare(
+            "SELECT username 
+         FROM FF_Users 
+         WHERE username = ?"
+        );
+
+
+        $stmt->bind_param(
+            "s",
+            $newusername
+        );
+
+
+        $stmt->execute();
+
+
+        $result = $stmt->get_result();
+
+
+        if ($result->num_rows) {
+
+            $data = [];
+
+            $data[0] = mysqli_fetch_assoc($result);
+
+            update_tables($username, $newusername);
+
+            return $data;
+        }
+        $conn->commit();
+
+    } catch (Exception $e) {
+
+        $conn->rollback();
+
     }
+
+
+    return false;
 }
+
+
 
 function update_tables($username, $newusername)
 {
     global $conn;
-    $sql = "UPDATE FF_Comments SET username = '$newusername' WHERE username = '$username'";
-    mysqli_query($conn, $sql);
 
-    $sql = "UPDATE FF_Following SET username = '$newusername' WHERE username = '$username'";
-    mysqli_query($conn, $sql);
 
-    $sql = "UPDATE FF_Following SET following = '$newusername' WHERE following = '$username'";
-    mysqli_query($conn, $sql);
+    $tables = [
 
-    $sql = "UPDATE FF_Messages SET sender = '$newusername' WHERE sender = '$username'";
-    mysqli_query($conn, $sql);
+        "UPDATE FF_Comments 
+         SET username = ? 
+         WHERE username = ?",
 
-    $sql = "UPDATE FF_Messages SET receiver = '$newusername' WHERE receiver = '$username'";
-    mysqli_query($conn, $sql);
 
-    $sql = "UPDATE FF_Status SET username = '$newusername' WHERE username = '$username'";
-    mysqli_query($conn, $sql);
+        "UPDATE FF_Following 
+         SET username = ? 
+         WHERE username = ?",
 
-    $sql = "UPDATE FF_StatusLikes SET username = '$newusername' WHERE username = '$username'";
-    mysqli_query($conn, $sql);
+
+        "UPDATE FF_Following 
+         SET following = ? 
+         WHERE following = ?",
+
+
+        "UPDATE FF_Messages 
+         SET sender = ? 
+         WHERE sender = ?",
+
+
+        "UPDATE FF_Messages 
+         SET receiver = ? 
+         WHERE receiver = ?",
+
+
+        "UPDATE FF_Status 
+         SET username = ? 
+         WHERE username = ?",
+
+
+        "UPDATE FF_StatusLikes 
+         SET username = ? 
+         WHERE username = ?"
+    ];
+
+
+    foreach ($tables as $sql) {
+
+        $stmt = $conn->prepare($sql);
+
+
+        $stmt->bind_param(
+            "ss",
+            $newusername,
+            $username
+        );
+
+
+        $stmt->execute();
+    }
 }
+
+
+
 
 function edit_firstname($username, $firstname)
 {
     global $conn;
-    $sql = "UPDATE FF_Users SET firstname = '$firstname' WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $sql = "Select username from FF_Users where username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $data = [];
-    if (mysqli_num_rows($result)) {
-        $data[0] = mysqli_fetch_assoc($result);
-        return $data;
-    } else
-        return false;
+
+
+    $stmt = $conn->prepare(
+        "UPDATE FF_Users 
+         SET firstname = ?
+         WHERE username = ?"
+    );
+
+
+    $stmt->bind_param(
+        "ss",
+        $firstname,
+        $username
+    );
+
+
+    $stmt->execute();
+
+
+    return get_user_edit_result($username);
 }
+
+
 
 function edit_lastname($username, $lastname)
 {
     global $conn;
-    $sql = "UPDATE FF_Users SET lastname = '$lastname' WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $sql = "Select username from FF_Users where username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $data = [];
-    if (mysqli_num_rows($result)) {
-        $data[0] = mysqli_fetch_assoc($result);
-        return $data;
-    } else
-        return false;
+
+
+    $stmt = $conn->prepare(
+        "UPDATE FF_Users 
+         SET lastname = ?
+         WHERE username = ?"
+    );
+
+
+    $stmt->bind_param(
+        "ss",
+        $lastname,
+        $username
+    );
+
+
+    $stmt->execute();
+
+
+    return get_user_edit_result($username);
 }
+
+
+
+
 function edit_bio($username, $bio)
 {
     global $conn;
-    $sql = "UPDATE FF_Users SET bio = '$bio' WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $sql = "Select username from FF_Users where username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $data = [];
-    if (mysqli_num_rows($result)) {
+
+
+    $stmt = $conn->prepare(
+        "UPDATE FF_Users 
+         SET bio = ?
+         WHERE username = ?"
+    );
+
+
+    $stmt->bind_param(
+        "ss",
+        $bio,
+        $username
+    );
+
+
+    $stmt->execute();
+
+
+    return get_user_edit_result($username);
+}
+
+
+
+
+function get_user_edit_result($username)
+{
+    global $conn;
+
+
+    $stmt = $conn->prepare(
+        "SELECT username 
+         FROM FF_Users 
+         WHERE username = ?"
+    );
+
+
+    $stmt->bind_param(
+        "s",
+        $username
+    );
+
+
+    $stmt->execute();
+
+
+    $result = $stmt->get_result();
+
+
+    if ($result->num_rows) {
+
+        $data = [];
+
         $data[0] = mysqli_fetch_assoc($result);
+
         return $data;
-    } else
-        return false;
+    }
+
+
+    return false;
 }
 function edit_email($username, $email)
 {
     if (check_email($email)) {
         return false;
     }
+
+
     global $conn;
-    $sql = "UPDATE FF_Users SET email = '$email' WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $sql = "Select username from FF_Users where username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $data = [];
-    if (mysqli_num_rows($result)) {
-        $data[0] = mysqli_fetch_assoc($result);
-    }
-    return $data;
+
+
+    $stmt = $conn->prepare(
+        "UPDATE FF_Users 
+         SET email = ?
+         WHERE username = ?"
+    );
+
+
+    $stmt->bind_param(
+        "ss",
+        $email,
+        $username
+    );
+
+
+    $stmt->execute();
+
+
+    return get_user_edit_result($username);
 }
+
+
+
 function edit_password($username, $password)
 {
     global $conn;
-    $sql = "UPDATE FF_Users SET password = '$password' WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $sql = "Select username from FF_Users where username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $data = [];
-    if (mysqli_num_rows($result)) {
-        $data[0] = mysqli_fetch_assoc($result);
-        return $data;
-    } else
-        return false;
+
+
+    // Hash password before storing
+    $password_hash = password_hash(
+        $password,
+        PASSWORD_DEFAULT
+    );
+
+
+    $stmt = $conn->prepare(
+        "UPDATE FF_Users
+         SET password = ?
+         WHERE username = ?"
+    );
+
+
+    $stmt->bind_param(
+        "ss",
+        $password_hash,
+        $username
+    );
+
+
+    $stmt->execute();
+
+
+    return get_user_edit_result($username);
 }
+
+
+
 function search_friends($term)
 {
     global $conn;
-    $sql = "Select * from Users WHERE username LIKE '%$term%'";
-    if ($term == '') {
-        $sql = "Select * from Users";
-    }
-    $result = mysqli_query($conn, $sql);
+
+
     $data = [];
     $i = 0;
-    if (mysqli_num_rows($result)) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $data[$i++] = $row;
-        }
+
+
+    if ($term == '') {
+
+        $stmt = $conn->prepare(
+            "SELECT username, firstname, lastname, bio FROM FF_Users"
+        );
+
+
+    } else {
+
+
+        $search = "%" . $term . "%";
+
+
+        $stmt = $conn->prepare(
+            "SELECT username, firstname, lastname, bio
+             FROM FF_Users
+             WHERE username LIKE ?"
+        );
+
+
+        $stmt->bind_param(
+            "s",
+            $search
+        );
     }
+
+
+    $stmt->execute();
+
+
+    $result = $stmt->get_result();
+
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[$i++] = $row;
+    }
+
+
     return $data;
 }
 
+
+
+
+
 function save_message($sender, $receiver, $message)
 {
-    //insert into messages table
     if (!user_exists_U($receiver)) {
-        //error, return
         return "Invalid Recipient";
     }
+
+
     global $conn;
+
+
     $current_date = date("Ymd");
-    $sql = "INSERT INTO FF_Messages VALUES (NULL, '$sender', '$receiver', '$message', '$current_date', 0);";
-    $result = mysqli_query($conn, $sql);
+
+
+    $stmt = $conn->prepare(
+        "INSERT INTO FF_Messages
+        (
+            sender,
+            receiver,
+            message,
+            message_date,
+            ReadOrNot
+        )
+        VALUES (?, ?, ?, ?, 0)"
+    );
+
+
+    $stmt->bind_param(
+        "ssss",
+        $sender,
+        $receiver,
+        $message,
+        $current_date
+    );
+
+
+    $result = $stmt->execute();
+
+
     if ($result) {
         return "Message Sent Successfully";
-    } else {
-        return "Error Sending Message";
     }
+
+
+    return "Error Sending Message";
 }
+
+
+
+
 function read_message($receiver, $readstate)
 {
     global $conn;
-    $sql = "select * from FF_Messages where receiver = '$receiver' and ReadOrNot = '$readstate';";
-    $result = mysqli_query($conn, $sql);
+
+
+    $stmt = $conn->prepare(
+        "SELECT *
+         FROM FF_Messages
+         WHERE receiver = ?
+         AND ReadOrNot = ?"
+    );
+
+
+    $stmt->bind_param(
+        "si",
+        $receiver,
+        $readstate
+    );
+
+
+    $stmt->execute();
+
+
+    $result = $stmt->get_result();
+
+
     $data = [];
     $i = 0;
-    if (mysqli_num_rows($result) > 0) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $data[$i++] = $row;
-            if ($readstate == 0) {
-                $id = $row['message_id'];
-                $sql = "UPDATE FF_Messages SET ReadOrNot = 1 WHERE message_id = '$id'";
-                mysqli_query($conn, $sql);
-            }
+
+
+    while ($row = mysqli_fetch_assoc($result)) {
+
+        $data[$i++] = $row;
+
+
+        if ($readstate == 0) {
+
+            $id = $row['message_id'];
+
+
+            $stmt2 = $conn->prepare(
+                "UPDATE FF_Messages
+                 SET ReadOrNot = 1
+                 WHERE message_id = ?"
+            );
+
+
+            $stmt2->bind_param(
+                "i",
+                $id
+            );
+
+
+            $stmt2->execute();
         }
     }
+
+
     return $data;
 }

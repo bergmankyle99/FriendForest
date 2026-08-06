@@ -919,7 +919,7 @@
                     document.getElementById('pane-messages-unread').innerHTML = "<p>No Messages</p>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>" + data[i]['send_date'] + "</p></div>";
+                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message'] + "</p><p>" + data[i]['message_date'] + "</p></div>";
                     }
                 }
             }
@@ -965,6 +965,7 @@
     function hideCommented() {
         $('#commented_title_div').hide();
         $('#display_comments_div').hide();
+        document.getElementById('display_comments_div').innerHTML = '';
     }
     $('#menu_item_edit, #menu_item_edit_mobile').click(function() {
         hideAll();
@@ -1056,7 +1057,7 @@
                     document.getElementById('pane-messages-unread').innerHTML = "<p>No Messages</p>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>" + data[i]['send_date'] + "</p></div>";
+                        document.getElementById('pane-messages-unread').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message'] + "</p><p>" + data[i]['message_date'] + "</p></div>";
                     }
                 }
             }
@@ -1080,7 +1081,7 @@
                     document.getElementById('pane-messages-read').innerHTML = "<p>No Messages</p>";
                 } else {
                     for (let i = 0; i < data.length; i++) {
-                        document.getElementById('pane-messages-read').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message_text'] + "</p><p>" + data[i]['send_date'] + "</p></div>";
+                        document.getElementById('pane-messages-read').innerHTML += "<div id = 'message_template_div' ><p>From: " + data[i]['sender'] + "</p><p>Message: " + data[i]['message'] + "</p><p>" + data[i]['message_date'] + "</p></div>";
                     }
                 }
             }
